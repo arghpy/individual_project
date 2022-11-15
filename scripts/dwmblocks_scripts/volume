@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+VOLUME=$(pamixer --get-volume)
+
+case $BUTTON in
+	6) st -e vim $(which $0);;
+esac
+
+echo "$VOLUME%"

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+killall dwmblocks 2>/dev/null
+dwmblocks &

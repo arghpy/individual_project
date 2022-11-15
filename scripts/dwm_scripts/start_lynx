@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+st -e lynx https://lite.duckduckgo.com/lite/

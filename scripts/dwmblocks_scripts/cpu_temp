@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+
+TEMP=$(echo "scale=1; $(sensors | grep Core | awk '{print $3}' | cut -b 2- | cut -b -4 | paste -sd+ - | bc)/$(nproc)" | bc -l)
+
+echo "$TEMP°C"
