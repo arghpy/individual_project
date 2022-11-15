@@ -20,6 +20,7 @@ static const char col_gray3[]       = "#bbbbbb";
 static const char col_gray4[]       = "#eeeeee";
 static const char col_gray5[]       = "#3f4e4f";
 static const char col_cyan[]        = "#005577";
+static const char col_cyan2[]       = "#a5c9ca";
 static const char col_black1[]      = "#2c3333";
 static const char col_black2[]      = "#2c3639";
 static const char col_BlackGreen[]  = "#3f4e4f";
@@ -36,7 +37,14 @@ static const char *colors[][3]      = {
 	/*[SchemeNorm] = { col_gray3, col_gray1, col_gray2 }, ORIGINAL */
 	[SchemeNorm] = { col_white2, col_BlackGreen, col_gray2 },
 	/*[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  }, ORIGINAL */
-	[SchemeSel]  = { col_black, col_BlackGreen,  col_cyan  },
+	[SchemeSel]  = { col_white2, col_BlackGreen,  col_cyan  },
+
+        [SchemeStatus]  = { col_white2, col_gray1,  "#000000"  }, // Statusbar right {text,background,not used but cannot be empty}
+        [SchemeTagsSel]  = { col_black, col_cyan2,  "#000000"  }, // Tagbar left selected {text,background,not used but cannotbe empty}
+        [SchemeTagsNorm]  = { col_gray3, col_gray1,  "#000000"  }, // Tagbar left unselected {text,background,not used but cannot be empty}
+        [SchemeInfoSel]  = { col_gray4, col_cyan,  "#000000"  }, // infobar middle  selected {text,background,not used but cannot be empty}
+        [SchemeInfoNorm]  = { col_gray3, col_gray1,  "#000000"  }, // infobar middle  unselected {text,background,not used but cannot be empty}
+
 };
 
 /* tagging */
@@ -156,4 +164,3 @@ static const Button buttons[] = {
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 };
-
