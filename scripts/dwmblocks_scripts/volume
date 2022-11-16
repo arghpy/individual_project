@@ -2,8 +2,21 @@
 
 VOLUME=$(pamixer --get-volume)
 
+
+HIGH=""
+LOW=""
+OFF=""
+
+
+if [[ $VOLUME > 60 ]]; then
+        echo "$HIGH $VOLUME%"
+elif (( $VOLUME <= 60 && $VOLUME > 10 )); then
+        echo "$LOW $VOLUME%"
+elif (( $VOLUME <= 10 )); then
+        echo "$OFF $VOLUME%"
+fi
+
+
 case $BUTTON in
 	6) st -e vim $(which $0);;
 esac
-
-echo "$VOLUME%"

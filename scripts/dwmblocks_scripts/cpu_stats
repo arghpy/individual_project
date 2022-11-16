@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+USAGE=$(echo "100" - $(iostat -c | awk '{print $NF}' | grep -A1 idle | tail -n1) | bc)
+
+echo " $USAGE%"
+
+# Implement the click actions
+case $BUTTON in
+        6) st -e vim $(which $0) ;;
+esac
+
+

@@ -32,6 +32,8 @@ wireplumber
 pipewire
 pipewire-audio
 pipewire-jack
+sysstat
+maim
 
 #Must have
 make
@@ -71,3 +73,7 @@ qalculate-gtk
 #zsh plugins
 zsh-autosuggestions from yay
 zsh-autocomplete from yay
+
+#Fonts
+ttf-font-awesome
+noto-fonts
