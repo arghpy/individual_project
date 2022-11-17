@@ -5,7 +5,7 @@ TOTAL_MEM=$(free -h | grep -i mem | awk '{print $2}')
 USED_MEM=$(free -h | grep -i mem | awk '{print $3}')
 
 RESULT="$USED_MEM/$TOTAL_MEM"
-printf ' %s' "$RESULT"
+printf ' %s' "$RESULT"
 
 case $BUTTON in
 	1) dunstify "$RESULT" ;;

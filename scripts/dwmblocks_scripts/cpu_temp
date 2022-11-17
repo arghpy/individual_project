@@ -1,16 +1,11 @@
 #!/usr/bin/env bash
 
-HIGH_TEMP=""
-LOW_TEMP=""
+ICON=""
 
 TEMP=$(echo "scale=1; $(sensors | grep Core | awk '{print $3}' | cut -b 2- | cut -b -4 | paste -sd+ - | bc)/$(nproc)" | bc -l)
 
 
-if [[ $TEMP > 60 ]]; then
-        echo "$HIGH_TEMP $TEMP°C"
-else
-        echo "$LOW_TEMP $TEMP°C"
-fi
+echo "$ICON $TEMP°C"
 
 # Implement the click actions
 case $BUTTON in

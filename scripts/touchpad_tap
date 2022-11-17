@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+ID=$(xinput --list | grep -i touch | grep -Eo "id=[1-9]*" | grep -Eo "[1-9]*")
+
+ID_TAP=$(xinput --list-props 14 | grep -i "tapping enabled (" | grep -Eo "\([0-9]*" | grep -Eo "[0-9]*")
+
+xinput --set-prop $ID $ID_TAP 1

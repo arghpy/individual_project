@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-USAGE=$(echo "100" - $(iostat -c | awk '{print $NF}' | grep -A1 idle | tail -n1) | bc)
+USAGE=$(echo "100 $(iostat -c | awk '{print $NF}' | grep -A1 idle | tail -n1)" | awk '{printf "%.2f", $1 - $2 }')
 
-echo " $USAGE%"
+echo " $USAGE%"
 
 # Implement the click actions
 case $BUTTON in
