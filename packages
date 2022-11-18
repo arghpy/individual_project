@@ -37,6 +37,7 @@ maim
 feh
 lightdm
 lightdm-gtk-greeter
+xinit-xsession
 
 #Must have
 make
