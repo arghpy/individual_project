@@ -34,6 +34,7 @@ pipewire-audio
 pipewire-jack
 sysstat
 maim
+feh
 
 #Must have
 make
