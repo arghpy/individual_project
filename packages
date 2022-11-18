@@ -35,6 +35,8 @@ pipewire-jack
 sysstat
 maim
 feh
+lightdm
+lightdm-gtk-greeter
 
 #Must have
 make
