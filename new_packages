@@ -67,6 +67,6 @@ proxychains,
 nmap,
 qalculate-gtk,
 zsh-autosuggestions,AUR
-zsh-autocomplete,
+zsh-autocomplete,AUR
 ttf-font-awesome,
 noto-fonts,
