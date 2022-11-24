@@ -1,46 +1,43 @@
 htop,
 scrot,
-lf,not found
+lf,not found,AUR
 bat,
 thunar,
-ssh,not found
-openssh-server,not found
+openssh,
 sudo,
 ueberzug,
 picom,
 dunst,
 xorg,
 xwallpaper,
-xrandr,not found
+xorg-xrandr,
 arandr,
 nitrogen,
 sxiv,
 bc,
-volumeicon-alsa,not found
+volumeicon,
 brightnessctl,
 aspell,
 xdg-user-dirs,
 xclip,
-yay,not found
+yay,GIT,https://aur.archlinux.org/yay.git
 pamixer,
 pavucontrol,
 nvtop,
-pulse-audio,not found
+pulseaudio,
 pulsemixer,
 wireplumber,
 pipewire,
-pipewire-audio,not found
-pipewire-jack,
 sysstat,
 maim,
 feh,
 lightdm,
 lightdm-gtk-greeter,
-xinit-xsession,not found
+xinit-xsession,AUR
 blueman,
 make,
 gcc,
-network-manager,not found
+networkmanager,
 man-db,
 unzip,
 p7zip,
@@ -52,7 +49,7 @@ linux-firmware,
 base,
 base-devel,
 python-pip,
-lm-sensors,not found
+lm_sensors,
 bat,
 ffmpegthumbnailer,
 noto-fonts,
@@ -65,7 +62,7 @@ gnome-epub-thumbnailer,
 odt2txt,
 gnupg,
 gummi,
-selectdefaultapplication,not found
+selectdefaultapplication-git,AUR
 proxychains,
 nmap,
 qalculate-gtk,
