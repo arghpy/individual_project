@@ -19,8 +19,8 @@ check_internet() {
 			 --yesno "Please check your internet connection.\\nIf your connection is through ethernet then make sure that the cable is connected.\\nIf you wish to connect thorugh wifi select 'nmtui'. Other wise select 'retry'." 10 60
 
 		case "$(echo $?)" in
-			1) nmtui ;;
-			0) check_internet ;;
+			0) nmtui ;;
+			1) check_internet ;;
 			*) exit 1 ;;
 		esac
 	
