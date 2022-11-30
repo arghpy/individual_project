@@ -24,6 +24,7 @@ check_internet() {
 			0) 
 
 				systemctl start NetworkManager > /dev/null 2>&1
+				sleep 2
 				nmtui 2>/dev/null
 				;;
 			1) 
