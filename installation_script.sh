@@ -1,22 +1,17 @@
 #!/usr/bin/env bash
 
 
+# Setting internet
+systemctl start NetworkManager >/dev/null 2>&1
+systemctl enable NetworkManager >/dev/null 2>&1
+
+
 
 # Installation script
 SCRIPT="https://raw.githubusercontent.com/arghpy/suckless_progs/main/installation_script.sh"
 
 # Programs to install
 PROGS_GIT="https://raw.githubusercontent.com/arghpy/suckless_progs/main/packages.csv"
-
-wifi_connection() {
-
-	iwctl device wlan0 set-property Powered on
-	iwctl device wlan0 set-property Mode station
-	iwctl station wlan0 scan
-	iwctl station wlan0 get-networks
-
-
-}
 
 # Check for internet
 check_internet() {
@@ -30,7 +25,7 @@ check_internet() {
 
 		case "$(echo $?)" in
 			0) 
-				nmtui 
+				nmtui 2>/dev/null
 				;;
 			1) 
 				sleep 2
@@ -51,8 +46,6 @@ check_internet
 # Necessities
 
 pacman-key --init
-pacman --noconfirm -Sy archlinux-keyring archlinux32-keyring
-pacman --noconfirm -S wget networkmanager
-systemctl start NetworkManager
-
-
+pacman -Sy
+pacman --noconfirm -Sy archlinux-keyring
+pacman --noconfirm -S wget
