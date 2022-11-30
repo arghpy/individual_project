@@ -67,7 +67,7 @@ disks
 
 if [[ -n $(echo $OPTIONS | grep $OPT 2>/dev/null) ]]; then
 	
-	DISK=$(lsblk -d -n | grep -v "loop" | awk '{print $1}' | awk ' NR == $OPT {print }')
+	DISK=$(lsblk -d -n | grep -v "loop" | awk '{print $1}' | awk ' NR == '$OPT' {print }')
 
 	sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
 g      # create new GPT partition
