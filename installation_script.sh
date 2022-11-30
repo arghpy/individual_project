@@ -49,3 +49,32 @@ pacman-key --init
 pacman -Sy
 pacman --noconfirm -Sy archlinux-keyring
 pacman --noconfirm -S wget
+
+
+
+# Partitioning
+
+disks(){
+	printf "\nSelect one of the options:\n\n"
+	lsblk -d -n | awk '{print $1, $4} | nl'
+	OPTIONS=$(lsblk -d -n | awk '{print $1, $4} | nl' | awk '{print $1}')
+	read -n 1 DISK
+}
+
+disks
+
+if [[ -n $(grep $DISK $OPTIONS 2>/dev/null) ]]; then
+	echo $DISK
+else
+	echo "Wrong option."
+	exit 1
+fi
+
+
+
+
+
+
+
+
+
