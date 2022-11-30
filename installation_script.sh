@@ -58,13 +58,42 @@ disks(){
 	printf "\nSelect one of the options:\n\n"
 	lsblk -d -n | grep -v "loop" | awk '{print $1, $4}' | nl
 	OPTIONS=$(lsblk -d -n | grep -v "loop" | awk '{print $1, $4}' | nl | awk '{print $1}')
-	read DISK
+	read OPT
 }
 
 disks
 
-if [[ -n $(echo $OPTIONS | grep $DISK 2>/dev/null) ]]; then
-	echo $DISK
+
+if [[ -n $(echo $OPTIONS | grep $OPT 2>/dev/null) ]]; then
+	
+	DISK=$(lsblk -d -n | grep -v "loop" | awk '{print $1}' | awk ' NR == $OPT {print }')
+
+	sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
+g      # create new GPT partition
+n      # add new partition
+       # partition number
+       # default - first sector 
++1G    # partition size
+y      # to remove signature if it is the case
+       # if there is a need to press enter
+       # if there is a need to press enter
+n      # add new partition
+       # partition number
+       # default - first sector 
++30G   # default - last sector 
+y      # to remove signature if it is the case
+       # if there is a need to press enter
+       # if there is a need to press enter
+n      # change partition type
+       # partition number
+       # default - first sector
+       # default - last sector
+y      # to remove signature if it is the case
+       # if there is a need to press enter
+       # if there is a need to press enter
+w      # write partition table and exit
+FDISK_CMDS
+
 else
 	echo "Wrong option."
 	exit 1
