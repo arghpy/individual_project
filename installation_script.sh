@@ -14,8 +14,8 @@ check_internet() {
 	if [[ $(ping -c1 8.8.8.8 > /dev/null 2>&1 ; echo $?) != 0 ]]; then
 
 		whiptail --title "Internet connection"\
-			 --yes-button "nmtui"
-			 -no-button "Retry"
+			 --yes-button "nmtui"\
+			 --no-button "Retry"\
 			 --msgbox "Please check your internet connection.\\nIf your connection is through ethernet then make sure that the cable is connected.\\nIf you wish to connect thorugh wifi select 'nmtui'. Other wise select 'retry'." 
 
 		case "$(echo $?)" in
