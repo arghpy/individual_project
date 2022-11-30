@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# Necessities
+
+pacman-key --init
+pacman --noconfirm -Sy archlinux-keyring archlinux32-keyring
+pacman --noconfirm -S wget networkmanager
+systemctl start NetworkManager
+
+
+
+
 # Installation script
 SCRIPT="https://raw.githubusercontent.com/arghpy/suckless_progs/main/installation_script.sh"
 
