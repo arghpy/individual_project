@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
 
-# Setting internet
-systemctl start NetworkManager >/dev/null 2>&1
-systemctl enable NetworkManager >/dev/null 2>&1
 
 
 
@@ -25,6 +22,8 @@ check_internet() {
 
 		case "$(echo $?)" in
 			0) 
+
+				systemctl start NetworkManager > /dev/null 2>&1
 				nmtui 2>/dev/null
 				;;
 			1) 
@@ -46,6 +45,7 @@ check_internet
 # Necessities
 
 pacman-key --init
+pacman-key --populate archlinux
 pacman -Sy
 pacman --noconfirm -Sy archlinux-keyring
 pacman --noconfirm -S wget
@@ -56,14 +56,14 @@ pacman --noconfirm -S wget
 
 disks(){
 	printf "\nSelect one of the options:\n\n"
-	lsblk -d -n | awk '{print $1, $4} | nl'
-	OPTIONS=$(lsblk -d -n | awk '{print $1, $4} | nl' | awk '{print $1}')
-	read -n 1 DISK
+	lsblk -d -n | grep -v "loop" | awk '{print $1, $4}' | nl
+	OPTIONS=$(lsblk -d -n | grep -v "loop" | awk '{print $1, $4}' | nl | awk '{print $1}')
+	read DISK
 }
 
 disks
 
-if [[ -n $(grep $DISK $OPTIONS 2>/dev/null) ]]; then
+if [[ -n $(echo $OPTIONS | grep $DISK 2>/dev/null) ]]; then
 	echo $DISK
 else
 	echo "Wrong option."
