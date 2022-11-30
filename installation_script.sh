@@ -16,7 +16,7 @@ check_internet() {
 		whiptail --title "Internet connection"\
 			 --yes-button "nmtui"\
 			 --no-button "Retry"\
-			 --msgbox "Please check your internet connection.\\nIf your connection is through ethernet then make sure that the cable is connected.\\nIf you wish to connect thorugh wifi select 'nmtui'. Other wise select 'retry'." 
+			 --yesno "Please check your internet connection.\\nIf your connection is through ethernet then make sure that the cable is connected.\\nIf you wish to connect thorugh wifi select 'nmtui'. Other wise select 'retry'." 
 
 		case "$(echo $?)" in
 			1) nmtui ;;
