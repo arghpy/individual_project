@@ -44,9 +44,11 @@ check_internet() {
 
 
 
-# Initializing keys and installing wget
+# Initializing keys, setting pacman and installing wget
 
 get_keys(){
+	P_DOWNLOADS=$(grep "ParallelDownloads" /etc/pacman.conf)
+	sed -i 's|'$P_DOWNLOADS'|ParallelDownloads = 5|g' /etc/pacman.conf
 	pacman-key --init
 	pacman-key --populate archlinux
 	pacman --noconfirm -Sy archlinux-keyring
@@ -136,7 +138,7 @@ mounting(){
 
 install_packages(){
 	wget $PROGS_GIT
-	pacstrap -K /mnt 
+	pacstrap -K /mnt $(awk -F ',' '{print $1}' packages.csv | paste -sd' ')
 }
 
 main(){
@@ -152,6 +154,8 @@ main(){
 	formatting
 
 	mounting
+
+	install_packages
 }
 
 
