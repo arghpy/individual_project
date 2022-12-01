@@ -234,30 +234,20 @@ grub(){
 
 main(){
 	
-	check_internet
 
-	get_keys
+	ln -sf /usr/share/zoneinfo/Europe/Bucharest /etc/localtime
 
-	disks
+	hwclock --systohc
 
-	partitioning
+	change_language
 
-	formatting
+	getuserandpass
 
-	mounting
+	adduserandpass
 
-	install_packages
+	yay_install
 
-	genfstab -U /mnt >> /mnt/etc/fstab
-
-
-
-	printf "\n\nNow entering the system.\nTo continue with the installation process execute the script installation_script_part2.sh\n\n# ./installation_script_part2.sh"
-
-	cp $(which installation_script_part2.sh) /mnt/usr/local/bin/
-
-	arch-chroot /mnt
-
+	grub
 }
 
 

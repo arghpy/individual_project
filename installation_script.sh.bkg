@@ -250,14 +250,21 @@ main(){
 
 	genfstab -U /mnt >> /mnt/etc/fstab
 
-
-
-	printf "\n\nNow entering the system.\nTo continue with the installation process execute the script installation_script_part2.sh\n\n# ./installation_script_part2.sh"
-
-	cp $(which installation_script_part2.sh) /mnt/usr/local/bin/
-
 	arch-chroot /mnt
 
+	ln -sf /usr/share/zoneinfo/Europe/Bucharest /etc/localtime
+
+	hwclock --systohc
+
+	change_language
+
+	getuserandpass
+
+	adduserandpass
+
+	yay_install
+
+	grub
 }
 
 
