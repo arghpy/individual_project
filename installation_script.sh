@@ -234,6 +234,10 @@ grub(){
 
 main(){
 	
+	printf "\nJust a moment...\n\n"
+
+	sleep 4
+
 	check_internet
 
 	get_keys
@@ -252,7 +256,7 @@ main(){
 
 
 
-	printf "\n\nNow entering the system.\nTo continue with the installation process execute the script installation_script_part2.sh\n\n# ./installation_script_part2.sh"
+	printf "\n\nNow entering the system.\nTo continue with the installation process execute the script installation_script_part2.sh\n\n# ./installation_script_part2.sh\n\n"
 
 	cp $(which installation_script_part2.sh) /mnt/usr/local/bin/
 
