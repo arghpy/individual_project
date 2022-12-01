@@ -39,18 +39,18 @@ check_internet() {
 	fi
 }
 
-check_internet
 
 
 
 # Necessities
 
-pacman-key --init
-pacman-key --populate archlinux
-pacman -Sy
-pacman --noconfirm -Sy archlinux-keyring
-pacman --noconfirm -S wget
-
+get_keys(){
+	pacman-key --init
+	pacman-key --populate archlinux
+	pacman -Sy
+	pacman --noconfirm -Sy archlinux-keyring
+	pacman --noconfirm -S wget
+}
 
 
 # Partitioning
@@ -62,7 +62,6 @@ disks(){
 	read OPT
 }
 
-disks
 
 partitioning(){
 if [[ -n $(echo $OPTIONS | grep $OPT 2>/dev/null) ]]; then
@@ -102,7 +101,6 @@ fi
 
 }
 
-partitioning
 
 formatting(){
 
@@ -114,23 +112,41 @@ formatting(){
 
 	ROOT_P=$(echo $PARTITIONS | grep -v "$BOOT_P\|$HOME_P")
 
-	mkfs.fat -F32 /dev/$BOOT_P
-	mkfs.ext4 /dev/$ROOT_P
-	mkfs.ext4 /dev/$HOME_P
+	mkfs.fat -F32 $(echo "/dev/$BOOT_P")
+	mkfs.ext4 $(echo "/dev/$ROOT_P")
+	mkfs.ext4 $(echo "/dev/$HOME_P")
 }
 
-formatting
 
 
 mounting(){
 
-	mount /dev/$ROOT_P /mnt
+	mount $(echo "/dev/$ROOT_P") /mnt
 
 	mkdir /mnt/boot
-	mount /dev/$BOOT_P /mnt/boot
+	mount $(echo "/dev/$BOOT_P") /mnt/boot
 
 	mkdir /mnt/home
-	mount /dev/$HOME_P /mnt/home
+	mount echo ("/dev/$HOME_P") /mnt/home
 }
 
-mounting
+
+
+main(){
+	
+	check_internet
+
+	get_keys
+
+	disks
+
+	partitioning
+
+	formatting
+
+	mounting
+}
+
+
+main
+
