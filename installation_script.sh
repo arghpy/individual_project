@@ -49,10 +49,9 @@ check_internet() {
 get_keys(){
 	P_DOWNLOADS=$(grep "ParallelDownloads" /etc/pacman.conf)
 	sed -i 's|'$P_DOWNLOADS'|ParallelDownloads = 5|g' /etc/pacman.conf
+	awk -v initial=$P_DOWNLOADS -v after="ParallelDownloads = 5" '{sub(initial, after); print;}' /etc/pacman.conf > /etc/pacman.conf
 	pacman-key --init
-	pacman-key --populate archlinux
 	pacman --noconfirm -Sy archlinux-keyring
-	pacman-key --populate archlinux
 	pacman --noconfirm -S wget
 }
 
@@ -131,7 +130,7 @@ mounting(){
 	mount $(echo "/dev/$BOOT_P") /mnt/boot
 
 	mkdir /mnt/home
-	mount echo ("/dev/$HOME_P") /mnt/home
+	mount $(echo "/dev/$HOME_P") /mnt/home
 }
 
 # Installing packages
@@ -140,6 +139,14 @@ install_packages(){
 	wget $PROGS_GIT
 	pacstrap -K /mnt $(cat packages.csv | grep -v "AUR\|GIT" | awk -F ',' '{print $1}' | paste -sd' ')
 }
+
+change_language(){
+	ENGLISH=$(grep "#en_US.UTF-8 UTF-8" /etc/locale.gen)
+	awk -v initial=$ENGLISH -v after="en_US.UTF-8 UTF-8" '{sub(initial, after); print;}' /etc/locale.gen > /etc/locale.gen
+	locale-gen
+	echo "LANG=en_US.UTF-8" > /etc/locale.conf
+}
+
 
 main(){
 	
@@ -156,6 +163,16 @@ main(){
 	mounting
 
 	install_packages
+
+	genfstab -U /mnt >> /mnt/etc/fstab
+
+	arch-chroot /mnt
+
+	ln -sf /usr/share/zoneinfo/Europe/Bucharest /etc/localtime
+
+	hwclock --systohc
+
+	
 }
 
 

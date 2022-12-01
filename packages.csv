@@ -6,6 +6,7 @@ base,
 base-devel,
 man-db,
 man-pages,
+vim,
 htop,
 scrot,
 lf,AUR
