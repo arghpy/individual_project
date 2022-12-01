@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 
+MODE="$1"
+DISK=$(lsblk -l -n | grep "$(lsblk -l | grep "/home" | awk '{print $1}' | cut -b-3)" | head -n1 | awk '{print $1}')
+
 
 # Installation script
 SCRIPT="https://raw.githubusercontent.com/arghpy/suckless_progs/main/installation_script.sh"
@@ -73,6 +76,10 @@ if [[ -n $(echo $OPTIONS | grep $OPT 2>/dev/null) ]]; then
 	
 	DISK=$(lsblk -d -n | grep -v "loop" | awk '{print $1}' | awk ' NR == '$OPT' {print }')
 
+	if [[ -n $(ls /sys/firmware/efi/efivars 2>/dev/null) ]];then
+
+		MODE="UEFI"
+
 	sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
 g      # create new GPT partition
 n      # add new partition
@@ -98,6 +105,44 @@ y      # to remove signature if it is the case
        # if there is a need to press enter
 w      # write partition table and exit
 FDISK_CMDS
+	
+	else
+
+	
+		MODE="BIOS"
+		
+	sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
+o      # create new GPT partition
+n      # add new partition
+       # partition number
+       # default - first sector 
++4G    # partition size
+y      # to remove signature if it is the case
+       # if there is a need to press enter
+       # if there is a need to press enter
+n      # add new partition
+       # partition number
+       # default - first sector 
++30G   # default - last sector 
+y      # to remove signature if it is the case
+       # if there is a need to press enter
+       # if there is a need to press enter
+n      # change partition type
+       # partition number
+       # default - first sector
+       # default - last sector
+y      # to remove signature if it is the case
+       # if there is a need to press enter
+       # if there is a need to press enter
+t      # if there is a need to press enter
+1      # if there is a need to press enter
+swap   # if there is a need to press enter
+       # if there is a need to press enter
+       # if there is a need to press enter
+w      # write partition table and exit
+FDISK_CMDS
+	
+	fi
 
 else
 	echo "Wrong option."
@@ -111,28 +156,62 @@ formatting(){
 
 	PARTITIONS=$(lsblk -l -n | grep "$DISK" | tail -n +2 | awk '{print $1}')
 
-	BOOT_P=$(echo "$PARTITIONS" | head -n1)
+	if [[ $MODE == "UEFI" ]]; then
 
-	HOME_P=$(echo "$PARTITIONS" | tail -n1)
+		BOOT_P=$(echo "$PARTITIONS" | head -n1)
+	
+		HOME_P=$(echo "$PARTITIONS" | tail -n1)
+	
+		ROOT_P=$(echo "$PARTITIONS" | grep -v "$BOOT_P\|$HOME_P")
+	
+		mkfs.fat -F32 $(echo "/dev/$BOOT_P")
+		mkfs.ext4 $(echo "/dev/$ROOT_P")
+		mkfs.ext4 $(echo "/dev/$HOME_P")
+	elif [[ $MODE == "BIOS" ]]; then
 
-	ROOT_P=$(echo "$PARTITIONS" | grep -v "$BOOT_P\|$HOME_P")
+		SWAP_P=$(echo "$PARTITIONS" | head -n1)
+	
+		HOME_P=$(echo "$PARTITIONS" | tail -n1)
+	
+		ROOT_P=$(echo "$PARTITIONS" | grep -v "$BOOT_P\|$HOME_P")
+	
+		mkswap $(echo "/dev/$BOOT_P")
+		mkfs.ext4 $(echo "/dev/$ROOT_P")
+		mkfs.ext4 $(echo "/dev/$HOME_P")
 
-	mkfs.fat -F32 $(echo "/dev/$BOOT_P")
-	mkfs.ext4 $(echo "/dev/$ROOT_P")
-	mkfs.ext4 $(echo "/dev/$HOME_P")
+	else
+		echo "An error occured. Exiting..."
+		exit 1
+	fi
 }
 
 
 # Mounting partitons
 mounting(){
 
-	mount $(echo "/dev/$ROOT_P") /mnt
+	if [[ $MODE == "UEFI" ]]; then
 
-	mkdir /mnt/boot
-	mount $(echo "/dev/$BOOT_P") /mnt/boot
+		mount $(echo "/dev/$ROOT_P") /mnt
 
-	mkdir /mnt/home
-	mount $(echo "/dev/$HOME_P") /mnt/home
+		mkdir /mnt/boot
+		mount $(echo "/dev/$BOOT_P") /mnt/boot
+
+		mkdir /mnt/home
+		mount $(echo "/dev/$HOME_P") /mnt/home
+
+	elif [[ $MODE == "BIOS" ]]; then
+
+		mount $(echo "/dev/$ROOT_P") /mnt
+	
+		swapon $(echo "/dev/$BOOT_P")
+	
+		mkdir /mnt/home
+		mount $(echo "/dev/$HOME_P") /mnt/home
+
+	else
+		echo "An error occured. Exiting..."
+		exit 1
+	fi
 }
 
 # Installing packages
@@ -224,9 +303,21 @@ yay_install() {
 
 grub(){
 
-	pacman -S grub efibootmgr
-	grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-	grub-mkconfig -o /boot/grub/grub.cfg
+	if [[ $MODE == "UEFI" ]]; then
+
+		pacman --noconfirm -S grub efibootmgr
+		grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+		grub-mkconfig -o /boot/grub/grub.cfg
+
+	elif [[ $MODE == "BIOS"]]; then
+		
+		pacman --noconfirm -S grub 
+		grub-install 
+		grub-mkconfig -o /boot/grub/grub.cfg
+	else
+		echo "An error occured at grub step. Exiting..."
+		exit 1
+	fi
 }
 
 
@@ -248,6 +339,8 @@ main(){
 	yay_install
 
 	grub
+
+	printf "\n\nInstallation finished.\nType \`shutdown now\`, take out the installation media and boot into the new system.\n\n"
 }
 
 

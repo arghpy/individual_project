@@ -70,22 +70,26 @@ disks(){
 # Creating partitions
 partitioning(){
 if [[ -n $(echo $OPTIONS | grep $OPT 2>/dev/null) ]]; then
-	
-	DISK=$(lsblk -d -n | grep -v "loop" | awk '{print $1}' | awk ' NR == '$OPT' {print }')
 
-	sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
+        DISK=$(lsblk -d -n | grep -v "loop" | awk '{print $1}' | awk ' NR == '$OPT' {print }')
+
+        if [[ -n $(ls /sys/firmware/efi/efivars 2>/dev/null) ]];then
+
+                MODE="UEFI"
+
+        sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
 g      # create new GPT partition
 n      # add new partition
        # partition number
-       # default - first sector 
+       # default - first sector
 +1G    # partition size
 y      # to remove signature if it is the case
        # if there is a need to press enter
        # if there is a need to press enter
 n      # add new partition
        # partition number
-       # default - first sector 
-+30G   # default - last sector 
+       # default - first sector
++30G   # default - last sector
 y      # to remove signature if it is the case
        # if there is a need to press enter
        # if there is a need to press enter
@@ -99,12 +103,51 @@ y      # to remove signature if it is the case
 w      # write partition table and exit
 FDISK_CMDS
 
+        else
+
+
+                MODE="BIOS"
+
+        sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
+o      # create new GPT partition
+n      # add new partition
+       # partition number
+       # default - first sector
++4G    # partition size
+y      # to remove signature if it is the case
+       # if there is a need to press enter
+       # if there is a need to press enter
+n      # add new partition
+       # partition number
+       # default - first sector
++30G   # default - last sector
+y      # if there is a need to press enter
+       # if there is a need to press enter
+       # if there is a need to press enter
+n      # change partition type
+       # partition number
+       # default - first sector
+       # default - last sector
+y      # to remove signature if it is the case
+       # if there is a need to press enter
+       # if there is a need to press enter
+t      # if there is a need to press enter
+1      # if there is a need to press enter
+swap   # if there is a need to press enter
+       # if there is a need to press enter
+       # if there is a need to press enter
+w      # write partition table and exit
+FDISK_CMDS
+
+        fi
+
 else
-	echo "Wrong option."
-	exit 1
+        echo "Wrong option."
+        exit 1
 fi
 
 }
+
 
 # Formatting partitions
 formatting(){
@@ -126,13 +169,29 @@ formatting(){
 # Mounting partitons
 mounting(){
 
-	mount $(echo "/dev/$ROOT_P") /mnt
+        if [[ $MODE == "UEFI" ]]; then
 
-	mkdir /mnt/boot
-	mount $(echo "/dev/$BOOT_P") /mnt/boot
+                mount $(echo "/dev/$ROOT_P") /mnt
 
-	mkdir /mnt/home
-	mount $(echo "/dev/$HOME_P") /mnt/home
+                mkdir /mnt/boot
+                mount $(echo "/dev/$BOOT_P") /mnt/boot
+
+                mkdir /mnt/home
+                mount $(echo "/dev/$HOME_P") /mnt/home
+
+        elif [[ $MODE == "BIOS" ]]; then
+
+                mount $(echo "/dev/$ROOT_P") /mnt
+
+                swapon $(echo "/dev/$BOOT_P")
+
+                mkdir /mnt/home
+                mount $(echo "/dev/$HOME_P") /mnt/home
+
+        else
+                echo "An error occured. Exiting..."
+                exit 1
+        fi
 }
 
 # Installing packages
@@ -256,7 +315,7 @@ main(){
 
 
 
-	printf "\n\nNow entering the system.\nTo continue with the installation process execute the script installation_script_part2.sh\n\n# ./installation_script_part2.sh\n\n"
+	printf "\n\nNow entering the system.\nThe boot mode is: %s.\nTo continue with the installation process execute the script installation_script_part2.sh specifying the mode.\n\n# installation_script_part2.sh BIOS\n\n# installation_script_part2.sh UEFI\n\n"
 
 	cp $(which installation_script_part2.sh) /mnt/usr/local/bin/
 
