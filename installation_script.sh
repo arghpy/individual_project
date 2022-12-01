@@ -48,8 +48,10 @@ check_internet() {
 
 get_keys(){
 	P_DOWNLOADS=$(grep "ParallelDownloads" /etc/pacman.conf)
-	sed -i 's|'$P_DOWNLOADS'|ParallelDownloads = 5|g' /etc/pacman.conf
-	awk -v initial=$P_DOWNLOADS -v after="ParallelDownloads = 5" '{sub(initial, after); print;}' /etc/pacman.conf > /etc/pacman.conf
+	awk -v initial="$P_DOWNLOADS" -v after="ParallelDownloads = 5" '{sub(initial, after); print}' /etc/pacman.conf > copy.pacman
+	rm /etc/pacman.conf
+	cp copy.pacman /etc/pacman.conf
+	rm copy.pacman
 	pacman-key --init
 	pacman --noconfirm -Sy archlinux-keyring
 	pacman --noconfirm -S wget
@@ -148,7 +150,10 @@ install_packages(){
 
 change_language(){
 	ENGLISH=$(grep "#en_US.UTF-8 UTF-8" /etc/locale.gen)
-	awk -v initial=$ENGLISH -v after="en_US.UTF-8 UTF-8" '{sub(initial, after); print;}' /etc/locale.gen > /etc/locale.gen
+	awk -v initial="$ENGLISH" -v after="en_US.UTF-8 UTF-8" '{sub(initial, after); print}' /etc/locale.gen > copy.locale.gen
+	rm /etc/locale.gen
+	cp copy.locale.gen /etc/locale.gen
+	rm copy.locale.gen
 	locale-gen
 	echo "LANG=en_US.UTF-8" > /etc/locale.conf
 }
@@ -167,9 +172,6 @@ set_hostname(){
 
 getuserandpass() {
 	NAME=$(whiptail --inputbox "Please enter a name for the user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
-	while ! echo "$name" | grep -q "^[a-z_][a-z0-9_-]*$"; do
-		NAME=$(whiptail --nocancel --inputbox "Username not valid. Give a username beginning with a letter, with only lowercase letters, - or _." 10 60 3>&1 1>&2 2>&3 3>&1)
-	done
 	PASS1=$(whiptail --nocancel --passwordbox "Enter a password for that user." 10 60 3>&1 1>&2 2>&3 3>&1)
 	PASS2=$(whiptail --nocancel --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
 	while ! [ "$PASS1" = "$PASS2" ]; do
@@ -211,9 +213,14 @@ yay_install() {
 	cd "$REPODIR/yay" || exit 1
 	sudo -u "$NAME" -D "$REPODIR/yay" \
 		makepkg --noconfirm -si >/dev/null 2>&1 || return 1
+
+	yay -S $(cat packages.csv | grep "AUR" | awk -F ',' '{print $1}' | paste -sd' ')
 }
 
 
+
+
+# Installing grub and creating configuration
 
 grub(){
 
@@ -256,6 +263,8 @@ main(){
 	adduserandpass
 
 	yay_install
+
+	grub
 }
 
 

@@ -37,7 +37,6 @@ brightnessctl,
 aspell,
 xdg-user-dirs,
 xclip,
-yay,GIT,https://aur.archlinux.org/yay.git
 pulsemixer,
 pamixer,
 wireplumber,
