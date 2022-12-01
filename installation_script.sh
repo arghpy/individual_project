@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 
+systemctl start NetworkManager > /dev/null 2>&1
 
 # Installation script
 SCRIPT="https://raw.githubusercontent.com/arghpy/suckless_progs/main/installation_script.sh"
@@ -25,7 +26,6 @@ check_internet() {
 		case "$(echo $?)" in
 			0) 
 
-				systemctl start NetworkManager > /dev/null 2>&1
 				sleep 3
 				nmtui 2>/dev/null
 				;;
@@ -45,14 +45,15 @@ check_internet() {
 
 
 # Initializing keys, setting pacman and installing wget
-
+# !!!!!! Put SigLevel = Never and after all is done put it again like it was !!!!!!
 get_keys(){
 	P_DOWNLOADS=$(grep "ParallelDownloads" /etc/pacman.conf)
-	awk -v initial="$P_DOWNLOADS" -v after="ParallelDownloads = 5" '{sub(initial, after); print}' /etc/pacman.conf > copy.pacman
+	awk -v initial_download="$P_DOWNLOADS" -v after_download="ParallelDownloads = 5" '{sub(initial_download, after_download); print}' /etc/pacman.conf > copy.pacman
 	rm /etc/pacman.conf
 	cp copy.pacman /etc/pacman.conf
 	rm copy.pacman
 	pacman-key --init
+	wait
 	pacman --noconfirm -Sy archlinux-keyring
 	pacman --noconfirm -S wget
 }
@@ -111,6 +112,7 @@ FDISK_CMDS
         sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
 o      # create new GPT partition
 n      # add new partition
+       # partition type
        # partition number
        # default - first sector
 +4G    # partition size
@@ -118,6 +120,7 @@ y      # to remove signature if it is the case
        # if there is a need to press enter
        # if there is a need to press enter
 n      # add new partition
+       # partition type
        # partition number
        # default - first sector
 +30G   # default - last sector
@@ -315,7 +318,7 @@ main(){
 
 
 
-	printf "\n\nNow entering the system.\nThe boot mode is: %s.\nTo continue with the installation process execute the script installation_script_part2.sh specifying the mode.\n\n# installation_script_part2.sh BIOS\n\n# installation_script_part2.sh UEFI\n\n"
+	printf "\n\nNow entering the system.\nThe boot mode is: %s.\nTo continue with the installation process execute the script installation_script_part2.sh specifying the mode.\n\n# installation_script_part2.sh BIOS\n\n# installation_script_part2.sh UEFI\n\n" "$MODE"
 
 	cp $(which installation_script_part2.sh) /mnt/usr/local/bin/
 

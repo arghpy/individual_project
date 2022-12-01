@@ -248,32 +248,20 @@ set_hostname(){
 
 
 # Get user and password: script taken from Luke Smith
-
-getuserandpass() {
+# passwd not working !!!!
+set_user() {
 	NAME=$(whiptail --inputbox "Please enter a name for the user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
-	PASS1=$(whiptail --nocancel --passwordbox "Enter a password for that user." 10 60 3>&1 1>&2 2>&3 3>&1)
-	PASS2=$(whiptail --nocancel --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
-	while ! [ "$PASS1" = "$PASS2" ]; do
-		unset PASS2
-		PASS1=$(whiptail --nocancel --passwordbox "Passwords do not match.\\n\\nEnter password again." 10 60 3>&1 1>&2 2>&3 3>&1)
-		PASS2=$(whiptail --nocancel --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
-	done
-}
 
+	passwd $(echo "$NAME")
 
-
-#Add user and its password: script taken from Luke Smith
-
-adduserandpass() {
 	whiptail --infobox "Adding user \"$NAME\"..." 7 50
 	useradd -m -g wheel -s /bin/zsh "$NAME" >/dev/null 2>&1 ||
 		usermod -a -G wheel "$NAME" && mkdir -p /home/"$NAME" && chown "$NAME":wheel /home/"$NAME"
 	export REPODIR="/home/$NAME/.local/src"
 	mkdir -p "$REPODIR"
 	chown -R "$NAME":wheel "$(dirname "$REPODIR")"
-	echo "$NAME:$PASS1" | chpasswd
-	unset PASS1 PASS2
 }
+
 
 
 #Install yay: script taken from Luke Smith
@@ -309,7 +297,7 @@ grub(){
 		grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 		grub-mkconfig -o /boot/grub/grub.cfg
 
-	elif [[ $MODE == "BIOS"]]; then
+	elif [[ $MODE == "BIOS" ]]; then
 		
 		pacman --noconfirm -S grub 
 		grub-install $(echo "/dev/$DISK")
@@ -324,7 +312,10 @@ grub(){
 # MAIN
 
 main(){
-	
+	pacman-key --init
+	wait
+	pacman -Sy
+	pacman-key --populate archlinux
 
 	ln -sf /usr/share/zoneinfo/Europe/Bucharest /etc/localtime
 
@@ -332,9 +323,9 @@ main(){
 
 	change_language
 
-	getuserandpass
+	set_hostname
 
-	adduserandpass
+	set_user
 
 	yay_install
 
