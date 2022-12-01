@@ -64,7 +64,7 @@ disks(){
 
 disks
 
-
+partitioning(){
 if [[ -n $(echo $OPTIONS | grep $OPT 2>/dev/null) ]]; then
 	
 	DISK=$(lsblk -d -n | grep -v "loop" | awk '{print $1}' | awk ' NR == '$OPT' {print }')
@@ -100,11 +100,26 @@ else
 	exit 1
 fi
 
+}
 
+partitioning
 
+formatting(){
 
+	PARTITIONS=$(lsblk -l -n | grep $DISK | tail -n +2 | awk '{print $1}')
 
+	BOOT_P=$(echo $PARTITIONS | head -n1)
 
+	HOME_P=$(echo $PARTITIONS | tail -n1)
+
+	ROOT_P=$(echo $PARTITIONS | grep -v "$BOOT_P\|$HOME_P")
+
+	mkfs.fat -F32 /dev/$BOOT_P
+	mkfs.ext4 /dev/$ROOT_P
+	mkfs.ext4 /dev/$HOME_P
+}
+
+formatting
 
 
 
