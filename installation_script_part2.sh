@@ -68,7 +68,7 @@ yay_install() {
 	sudo -u "$NAME" -D "$REPODIR/yay" \
 		makepkg --noconfirm -si >/dev/null 2>&1 || return 1
 
-	cp packages.csv $(echo "/home/$NAME/")
+	sudo -u "$NAME" wget $PROGS_GIT
 	sudo -u "$NAME" yay -S $(cat packages.csv | grep "AUR" | awk -F ',' '{print $1}' | paste -sd' ')
 }
 
@@ -138,7 +138,11 @@ main(){
         cp copy.xdg /etc/xdg/user-dirs.conf
         rm copy.xdg
 
-#COPY FILES FROM /etc/skel onto the system!!!!!
+
+	for i in $(ls -l $(echo "/home/$NAME/.local/src") | awk '{print $NF}' | grep -v "yay");do
+		cd $i
+		make clean install
+	done
 
 	printf "\n\nInstallation finished.\nType \`shutdown now\`, take out the installation media and boot into the new system.\n\n"
 }
