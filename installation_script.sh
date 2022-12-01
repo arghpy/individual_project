@@ -180,6 +180,38 @@ getuserandpass() {
 }
 
 
+
+#Add user and its password: script taken from Luke Smith
+
+adduserandpass() {
+	whiptail --infobox "Adding user \"$NAME\"..." 7 50
+	useradd -m -g wheel -s /bin/zsh "$NAME" >/dev/null 2>&1 ||
+		usermod -a -G wheel "$NAME" && mkdir -p /home/"$NAME" && chown "$NAME":wheel /home/"$NAME"
+	export REPODIR="/home/$NAME/.local/src"
+	mkdir -p "$REPODIR"
+	echo "$NAME:$PASS1" | chpasswd
+	unset PASS1 PASS2
+}
+
+
+#Install yay: script taken from Luke Smith
+
+yay_install() {
+	# Installs $1 manually. Used only for AUR helper here.
+	# Should be run after repodir is created and var is set.
+	whiptail --infobox "Installing yay, an AUR helper..." 7 50
+	sudo -u "$NAME" mkdir -p "$REPODIR/yay"
+	sudo -u "$NAME" git -C "$REPODIR" clone --depth 1 --single-branch \
+		--no-tags -q "https://aur.archlinux.org/yay.git" "$REPODIR/yay" ||
+		{
+			cd "$REPODIR/yay" || return 1
+			sudo -u "$NAME" git pull --force origin master
+		}
+	cd "$REPODIR/yay" || exit 1
+	sudo -u "$NAME" -D "$REPODIR/yay" \
+		makepkg --noconfirm -si >/dev/null 2>&1 || return 1
+}
+
 # MAIN
 
 main(){
@@ -209,6 +241,8 @@ main(){
 	change_language
 
 	getuserandpass
+
+	adduserandpass
 }
 
 
