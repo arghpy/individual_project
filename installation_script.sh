@@ -122,4 +122,15 @@ formatting(){
 formatting
 
 
+mounting(){
 
+	mount /dev/$ROOT_P /mnt
+
+	mkdir /mnt/boot
+	mount /dev/$BOOT_P /mnt/boot
+
+	mkdir /mnt/home
+	mount /dev/$HOME_P /mnt/home
+}
+
+mounting
