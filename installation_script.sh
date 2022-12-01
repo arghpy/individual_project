@@ -154,6 +154,8 @@ change_language(){
 }
 
 
+# Setting the hostname
+
 set_hostname(){
 	printf "\n\nPlease enter a hostname for the system:\n\n"
 	read SYS_HOSTNAME
@@ -161,7 +163,21 @@ set_hostname(){
 }
 
 
+# Get user and password: script taken from Luke Smith
 
+getuserandpass() {
+	NAME=$(whiptail --inputbox "Please enter a name for the user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
+	while ! echo "$name" | grep -q "^[a-z_][a-z0-9_-]*$"; do
+		NAME=$(whiptail --nocancel --inputbox "Username not valid. Give a username beginning with a letter, with only lowercase letters, - or _." 10 60 3>&1 1>&2 2>&3 3>&1)
+	done
+	PASS1=$(whiptail --nocancel --passwordbox "Enter a password for that user." 10 60 3>&1 1>&2 2>&3 3>&1)
+	PASS2=$(whiptail --nocancel --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
+	while ! [ "$PASS1" = "$PASS2" ]; do
+		unset PASS2
+		PASS1=$(whiptail --nocancel --passwordbox "Passwords do not match.\\n\\nEnter password again." 10 60 3>&1 1>&2 2>&3 3>&1)
+		PASS2=$(whiptail --nocancel --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
+	done
+}
 
 
 # MAIN
@@ -192,7 +208,7 @@ main(){
 
 	change_language
 
-	
+	getuserandpass
 }
 
 
