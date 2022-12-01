@@ -189,6 +189,7 @@ adduserandpass() {
 		usermod -a -G wheel "$NAME" && mkdir -p /home/"$NAME" && chown "$NAME":wheel /home/"$NAME"
 	export REPODIR="/home/$NAME/.local/src"
 	mkdir -p "$REPODIR"
+	chown -R "$NAME":wheel "$(dirname "$REPODIR")"
 	echo "$NAME:$PASS1" | chpasswd
 	unset PASS1 PASS2
 }
@@ -211,6 +212,16 @@ yay_install() {
 	sudo -u "$NAME" -D "$REPODIR/yay" \
 		makepkg --noconfirm -si >/dev/null 2>&1 || return 1
 }
+
+
+
+grub(){
+
+	pacman -S grub efibootmgr
+	grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+	grub-mkconfig -o /boot/grub/grub.cfg
+}
+
 
 # MAIN
 
@@ -243,6 +254,8 @@ main(){
 	getuserandpass
 
 	adduserandpass
+
+	yay_install
 }
 
 
