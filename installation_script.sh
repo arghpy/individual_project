@@ -140,6 +140,12 @@ install_packages(){
 	pacstrap -K /mnt $(cat packages.csv | grep -v "AUR\|GIT" | awk -F ',' '{print $1}' | paste -sd' ')
 }
 
+
+
+
+
+# Changing the language to english
+
 change_language(){
 	ENGLISH=$(grep "#en_US.UTF-8 UTF-8" /etc/locale.gen)
 	awk -v initial=$ENGLISH -v after="en_US.UTF-8 UTF-8" '{sub(initial, after); print;}' /etc/locale.gen > /etc/locale.gen
@@ -147,6 +153,18 @@ change_language(){
 	echo "LANG=en_US.UTF-8" > /etc/locale.conf
 }
 
+
+set_hostname(){
+	printf "\n\nPlease enter a hostname for the system:\n\n"
+	read SYS_HOSTNAME
+	echo "$SYS_HOSTNAME" > /etc/hostname
+}
+
+
+
+
+
+# MAIN
 
 main(){
 	
@@ -171,6 +189,8 @@ main(){
 	ln -sf /usr/share/zoneinfo/Europe/Bucharest /etc/localtime
 
 	hwclock --systohc
+
+	change_language
 
 	
 }
