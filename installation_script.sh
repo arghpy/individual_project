@@ -45,10 +45,10 @@ check_internet() {
 
 
 # Initializing keys, setting pacman and installing wget
-# !!!!!! Put SigLevel = Never and after all is done put it again like it was !!!!!!
 get_keys(){
 	P_DOWNLOADS=$(grep "ParallelDownloads" /etc/pacman.conf)
-	awk -v initial_download="$P_DOWNLOADS" -v after_download="ParallelDownloads = 5" '{sub(initial_download, after_download); print}' /etc/pacman.conf > copy.pacman
+	P_SIGLEVEL=$(grep -iE "^SIGLEVEL" /etc/pacman.conf)
+	awk -v initial_download="$P_DOWNLOADS" -v after_download="ParallelDownloads = 5" -v initial_siglevel="$P_SIGLEVEL" -v after_siglevel="SigLevel    = Never" '{sub(initial_download, after_download); sub(initial_siglevel, after_siglevel); print}' /etc/pacman.conf > copy.pacman
 	rm /etc/pacman.conf
 	cp copy.pacman /etc/pacman.conf
 	rm copy.pacman
@@ -205,93 +205,6 @@ install_packages(){
 }
 
 
-
-
-
-# Changing the language to english
-
-change_language(){
-	ENGLISH=$(grep "#en_US.UTF-8 UTF-8" /etc/locale.gen)
-	awk -v initial="$ENGLISH" -v after="en_US.UTF-8 UTF-8" '{sub(initial, after); print}' /etc/locale.gen > copy.locale.gen
-	rm /etc/locale.gen
-	cp copy.locale.gen /etc/locale.gen
-	rm copy.locale.gen
-	locale-gen
-	echo "LANG=en_US.UTF-8" > /etc/locale.conf
-}
-
-
-# Setting the hostname
-
-set_hostname(){
-	printf "\n\nPlease enter a hostname for the system:\n\n"
-	read SYS_HOSTNAME
-	echo "$SYS_HOSTNAME" > /etc/hostname
-}
-
-
-# Get user and password: script taken from Luke Smith
-
-getuserandpass() {
-	NAME=$(whiptail --inputbox "Please enter a name for the user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
-	PASS1=$(whiptail --nocancel --passwordbox "Enter a password for that user." 10 60 3>&1 1>&2 2>&3 3>&1)
-	PASS2=$(whiptail --nocancel --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
-	while ! [ "$PASS1" = "$PASS2" ]; do
-		unset PASS2
-		PASS1=$(whiptail --nocancel --passwordbox "Passwords do not match.\\n\\nEnter password again." 10 60 3>&1 1>&2 2>&3 3>&1)
-		PASS2=$(whiptail --nocancel --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
-	done
-}
-
-
-
-#Add user and its password: script taken from Luke Smith
-
-adduserandpass() {
-	whiptail --infobox "Adding user \"$NAME\"..." 7 50
-	useradd -m -g wheel -s /bin/zsh "$NAME" >/dev/null 2>&1 ||
-		usermod -a -G wheel "$NAME" && mkdir -p /home/"$NAME" && chown "$NAME":wheel /home/"$NAME"
-	export REPODIR="/home/$NAME/.local/src"
-	mkdir -p "$REPODIR"
-	chown -R "$NAME":wheel "$(dirname "$REPODIR")"
-	echo "$NAME:$PASS1" | chpasswd
-	unset PASS1 PASS2
-}
-
-
-#Install yay: script taken from Luke Smith
-
-yay_install() {
-	# Installs $1 manually. Used only for AUR helper here.
-	# Should be run after repodir is created and var is set.
-	whiptail --infobox "Installing yay, an AUR helper..." 7 50
-	sudo -u "$NAME" mkdir -p "$REPODIR/yay"
-	sudo -u "$NAME" git -C "$REPODIR" clone --depth 1 --single-branch \
-		--no-tags -q "https://aur.archlinux.org/yay.git" "$REPODIR/yay" ||
-		{
-			cd "$REPODIR/yay" || return 1
-			sudo -u "$NAME" git pull --force origin master
-		}
-	cd "$REPODIR/yay" || exit 1
-	sudo -u "$NAME" -D "$REPODIR/yay" \
-		makepkg --noconfirm -si >/dev/null 2>&1 || return 1
-
-	yay -S $(cat packages.csv | grep "AUR" | awk -F ',' '{print $1}' | paste -sd' ')
-}
-
-
-
-
-# Installing grub and creating configuration
-
-grub(){
-
-	pacman -S grub efibootmgr
-	grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-	grub-mkconfig -o /boot/grub/grub.cfg
-}
-
-
 # MAIN
 
 main(){
@@ -317,10 +230,13 @@ main(){
 	genfstab -U /mnt >> /mnt/etc/fstab
 
 
-
-	printf "\n\nNow entering the system.\nThe boot mode is: %s.\nTo continue with the installation process execute the script installation_script_part2.sh specifying the mode.\n\n# installation_script_part2.sh BIOS\n\n# installation_script_part2.sh UEFI\n\n" "$MODE"
+	printf "\n\nNow entering the system.\n\nThe boot mode is: %s.\n\nTo continue with the installation process execute the script installation_script_part2.sh specifying the mode.\n\n# installation_script_part2.sh BIOS\n\n# installation_script_part2.sh UEFI\n\n" "$MODE"
 
 	cp $(which installation_script_part2.sh) /mnt/usr/local/bin/
+
+	rm -rf /mnt/etc/skel/*
+
+	cp -r /etc/skel/* /mnt/etc/skel/
 
 	arch-chroot /mnt
 

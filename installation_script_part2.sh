@@ -13,218 +13,6 @@ PROGS_GIT="https://raw.githubusercontent.com/arghpy/suckless_progs/main/packages
 
 
 
-
-
-# Check for internet
-check_internet() {
-
-	if [[ $(ping -c1 8.8.8.8 > /dev/null 2>&1 ; echo $?) != 0 ]]; then
-
-		whiptail --title "Internet connection"\
-			 --yes-button "nmtui"\
-			 --no-button "Retry"\
-			 --yesno "Please check your internet connection.\\nIf your connection is through ethernet then make sure that the cable is connected.\\nIf you wish to connect thorugh wifi select 'nmtui'. Other wise select 'retry'." 10 60
-
-		case "$(echo $?)" in
-			0) 
-
-				systemctl start NetworkManager > /dev/null 2>&1
-				sleep 3
-				nmtui 2>/dev/null
-				;;
-			1) 
-				sleep 2
-				check_internet 
-				;;
-			*) 
-				exit 1 
-				;;
-		esac
-	
-	fi
-}
-
-
-
-
-# Initializing keys, setting pacman and installing wget
-
-get_keys(){
-	P_DOWNLOADS=$(grep "ParallelDownloads" /etc/pacman.conf)
-	awk -v initial="$P_DOWNLOADS" -v after="ParallelDownloads = 5" '{sub(initial, after); print}' /etc/pacman.conf > copy.pacman
-	rm /etc/pacman.conf
-	cp copy.pacman /etc/pacman.conf
-	rm copy.pacman
-	pacman-key --init
-	pacman --noconfirm -Sy archlinux-keyring
-	pacman --noconfirm -S wget
-}
-
-
-# Selecting the disk to install on
-
-disks(){
-	printf "\nSelect one of the options:\n\n"
-	lsblk -d -n | grep -v "loop" | awk '{print $1, $4}' | nl
-	OPTIONS=$(lsblk -d -n | grep -v "loop" | awk '{print $1, $4}' | nl | awk '{print $1}')
-	read OPT
-}
-
-# Creating partitions
-partitioning(){
-if [[ -n $(echo $OPTIONS | grep $OPT 2>/dev/null) ]]; then
-	
-	DISK=$(lsblk -d -n | grep -v "loop" | awk '{print $1}' | awk ' NR == '$OPT' {print }')
-
-	if [[ -n $(ls /sys/firmware/efi/efivars 2>/dev/null) ]];then
-
-		MODE="UEFI"
-
-	sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
-g      # create new GPT partition
-n      # add new partition
-       # partition number
-       # default - first sector 
-+1G    # partition size
-y      # to remove signature if it is the case
-       # if there is a need to press enter
-       # if there is a need to press enter
-n      # add new partition
-       # partition number
-       # default - first sector 
-+30G   # default - last sector 
-y      # to remove signature if it is the case
-       # if there is a need to press enter
-       # if there is a need to press enter
-n      # change partition type
-       # partition number
-       # default - first sector
-       # default - last sector
-y      # to remove signature if it is the case
-       # if there is a need to press enter
-       # if there is a need to press enter
-w      # write partition table and exit
-FDISK_CMDS
-	
-	else
-
-	
-		MODE="BIOS"
-		
-	sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
-o      # create new GPT partition
-n      # add new partition
-       # partition number
-       # default - first sector 
-+4G    # partition size
-y      # to remove signature if it is the case
-       # if there is a need to press enter
-       # if there is a need to press enter
-n      # add new partition
-       # partition number
-       # default - first sector 
-+30G   # default - last sector 
-y      # to remove signature if it is the case
-       # if there is a need to press enter
-       # if there is a need to press enter
-n      # change partition type
-       # partition number
-       # default - first sector
-       # default - last sector
-y      # to remove signature if it is the case
-       # if there is a need to press enter
-       # if there is a need to press enter
-t      # if there is a need to press enter
-1      # if there is a need to press enter
-swap   # if there is a need to press enter
-       # if there is a need to press enter
-       # if there is a need to press enter
-w      # write partition table and exit
-FDISK_CMDS
-	
-	fi
-
-else
-	echo "Wrong option."
-	exit 1
-fi
-
-}
-
-# Formatting partitions
-formatting(){
-
-	PARTITIONS=$(lsblk -l -n | grep "$DISK" | tail -n +2 | awk '{print $1}')
-
-	if [[ $MODE == "UEFI" ]]; then
-
-		BOOT_P=$(echo "$PARTITIONS" | head -n1)
-	
-		HOME_P=$(echo "$PARTITIONS" | tail -n1)
-	
-		ROOT_P=$(echo "$PARTITIONS" | grep -v "$BOOT_P\|$HOME_P")
-	
-		mkfs.fat -F32 $(echo "/dev/$BOOT_P")
-		mkfs.ext4 $(echo "/dev/$ROOT_P")
-		mkfs.ext4 $(echo "/dev/$HOME_P")
-	elif [[ $MODE == "BIOS" ]]; then
-
-		SWAP_P=$(echo "$PARTITIONS" | head -n1)
-	
-		HOME_P=$(echo "$PARTITIONS" | tail -n1)
-	
-		ROOT_P=$(echo "$PARTITIONS" | grep -v "$BOOT_P\|$HOME_P")
-	
-		mkswap $(echo "/dev/$BOOT_P")
-		mkfs.ext4 $(echo "/dev/$ROOT_P")
-		mkfs.ext4 $(echo "/dev/$HOME_P")
-
-	else
-		echo "An error occured. Exiting..."
-		exit 1
-	fi
-}
-
-
-# Mounting partitons
-mounting(){
-
-	if [[ $MODE == "UEFI" ]]; then
-
-		mount $(echo "/dev/$ROOT_P") /mnt
-
-		mkdir /mnt/boot
-		mount $(echo "/dev/$BOOT_P") /mnt/boot
-
-		mkdir /mnt/home
-		mount $(echo "/dev/$HOME_P") /mnt/home
-
-	elif [[ $MODE == "BIOS" ]]; then
-
-		mount $(echo "/dev/$ROOT_P") /mnt
-	
-		swapon $(echo "/dev/$BOOT_P")
-	
-		mkdir /mnt/home
-		mount $(echo "/dev/$HOME_P") /mnt/home
-
-	else
-		echo "An error occured. Exiting..."
-		exit 1
-	fi
-}
-
-# Installing packages
-
-install_packages(){
-	wget $PROGS_GIT
-	pacstrap -K /mnt $(cat packages.csv | grep -v "AUR\|GIT" | awk -F ',' '{print $1}' | paste -sd' ')
-}
-
-
-
-
-
 # Changing the language to english
 
 change_language(){
@@ -248,18 +36,19 @@ set_hostname(){
 
 
 # Get user and password: script taken from Luke Smith
-# passwd not working !!!!
+
 set_user() {
 	NAME=$(whiptail --inputbox "Please enter a name for the user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
 
-	passwd $(echo "$NAME")
-
-	whiptail --infobox "Adding user \"$NAME\"..." 7 50
-	useradd -m -g wheel -s /bin/zsh "$NAME" >/dev/null 2>&1 ||
-		usermod -a -G wheel "$NAME" && mkdir -p /home/"$NAME" && chown "$NAME":wheel /home/"$NAME"
+	useradd -m -g wheel -s /bin/zsh "$NAME" >/dev/null 2>&1
+	usermod -a -G wheel "$NAME"
 	export REPODIR="/home/$NAME/.local/src"
 	mkdir -p "$REPODIR"
 	chown -R "$NAME":wheel "$(dirname "$REPODIR")"
+	clear
+	printf "\n\nEnter password for %s\n\n" "$NAME"
+	passwd $(echo "$NAME")
+
 }
 
 
@@ -267,8 +56,6 @@ set_user() {
 #Install yay: script taken from Luke Smith
 
 yay_install() {
-	# Installs $1 manually. Used only for AUR helper here.
-	# Should be run after repodir is created and var is set.
 	whiptail --infobox "Installing yay, an AUR helper..." 7 50
 	sudo -u "$NAME" mkdir -p "$REPODIR/yay"
 	sudo -u "$NAME" git -C "$REPODIR" clone --depth 1 --single-branch \
@@ -281,7 +68,8 @@ yay_install() {
 	sudo -u "$NAME" -D "$REPODIR/yay" \
 		makepkg --noconfirm -si >/dev/null 2>&1 || return 1
 
-	yay -S $(cat packages.csv | grep "AUR" | awk -F ',' '{print $1}' | paste -sd' ')
+	cp packages.csv $(echo "/home/$NAME/")
+	sudo -u "$NAME" yay -S $(cat packages.csv | grep "AUR" | awk -F ',' '{print $1}' | paste -sd' ')
 }
 
 
@@ -330,6 +118,27 @@ main(){
 	yay_install
 
 	grub
+
+	systemctl start NetworkManager
+
+	systemctl enable NetworkManager
+
+	mv $(echo "/home/$NAME/zshrc.bkg") $(echo "/home/$NAME/.zshrc")
+	mv $(echo "/home/$NAME/config") $(echo "/home/$NAME/.config")
+	mv $(echo "/home/$NAME/local") $(echo "/home/$NAME/.local")
+	mv $(echo "/home/$NAME/profile") $(echo "/home/$NAME/.profile")
+	mv $(echo "/home/$NAME/xinitrc") $(echo "/home/$NAME/.xinitrc")
+	mv $(echo "/home/$NAME/vim") $(echo "/home/$NAME/.vim")
+	
+	echo "%wheel ALL=(ALL:ALL) ALL" >> /etc/sudoers
+
+	XDG_DEFAULTS=$(grep -iE "^enabled" /etc/xdg/user-dirs.conf)
+        awk -v initial_XDG="$XDG_DEFAULTS" -v after_XDG="enabled=False" '{sub(initial_XDG, after_XDG); print}' /etc/xdg/user-dirs.conf > copy.xdg
+        rm /etc/xdg/user-dirs.conf
+        cp copy.xdg /etc/xdg/user-dirs.conf
+        rm copy.xdg
+
+#COPY FILES FROM /etc/skel onto the system!!!!!
 
 	printf "\n\nInstallation finished.\nType \`shutdown now\`, take out the installation media and boot into the new system.\n\n"
 }
