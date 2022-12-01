@@ -2,13 +2,15 @@
 
 
 
-
-
 # Installation script
 SCRIPT="https://raw.githubusercontent.com/arghpy/suckless_progs/main/installation_script.sh"
 
 # Programs to install
 PROGS_GIT="https://raw.githubusercontent.com/arghpy/suckless_progs/main/packages.csv"
+
+
+
+
 
 # Check for internet
 check_internet() {
@@ -24,7 +26,7 @@ check_internet() {
 			0) 
 
 				systemctl start NetworkManager > /dev/null 2>&1
-				sleep 2
+				sleep 3
 				nmtui 2>/dev/null
 				;;
 			1) 
@@ -42,18 +44,18 @@ check_internet() {
 
 
 
-# Necessities
+# Initializing keys and installing wget
 
 get_keys(){
 	pacman-key --init
 	pacman-key --populate archlinux
-	pacman -Sy
 	pacman --noconfirm -Sy archlinux-keyring
+	pacman-key --populate archlinux
 	pacman --noconfirm -S wget
 }
 
 
-# Partitioning
+# Selecting the disk to install on
 
 disks(){
 	printf "\nSelect one of the options:\n\n"
@@ -62,7 +64,7 @@ disks(){
 	read OPT
 }
 
-
+# Creating partitions
 partitioning(){
 if [[ -n $(echo $OPTIONS | grep $OPT 2>/dev/null) ]]; then
 	
@@ -101,7 +103,7 @@ fi
 
 }
 
-
+# Formatting partitions
 formatting(){
 
 	PARTITIONS=$(lsblk -l -n | grep "$DISK" | tail -n +2 | awk '{print $1}')
@@ -118,7 +120,7 @@ formatting(){
 }
 
 
-
+# Mounting partitons
 mounting(){
 
 	mount $(echo "/dev/$ROOT_P") /mnt
@@ -130,7 +132,12 @@ mounting(){
 	mount echo ("/dev/$HOME_P") /mnt/home
 }
 
+# Installing packages
 
+install_packages(){
+	wget $PROGS_GIT
+	pacstrap -K /mnt 
+}
 
 main(){
 	
