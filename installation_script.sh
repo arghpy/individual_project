@@ -104,13 +104,13 @@ fi
 
 formatting(){
 
-	PARTITIONS=$(lsblk -l -n | grep $DISK | tail -n +2 | awk '{print $1}')
+	PARTITIONS=$(lsblk -l -n | grep "$DISK" | tail -n +2 | awk '{print $1}')
 
-	BOOT_P=$(echo $PARTITIONS | head -n1)
+	BOOT_P=$(echo "$PARTITIONS" | head -n1)
 
-	HOME_P=$(echo $PARTITIONS | tail -n1)
+	HOME_P=$(echo "$PARTITIONS" | tail -n1)
 
-	ROOT_P=$(echo $PARTITIONS | grep -v "$BOOT_P\|$HOME_P")
+	ROOT_P=$(echo "$PARTITIONS" | grep -v "$BOOT_P\|$HOME_P")
 
 	mkfs.fat -F32 $(echo "/dev/$BOOT_P")
 	mkfs.ext4 $(echo "/dev/$ROOT_P")
