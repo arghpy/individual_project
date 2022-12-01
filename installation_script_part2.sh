@@ -312,7 +312,7 @@ grub(){
 	elif [[ $MODE == "BIOS"]]; then
 		
 		pacman --noconfirm -S grub 
-		grub-install 
+		grub-install $(echo "/dev/$DISK")
 		grub-mkconfig -o /boot/grub/grub.cfg
 	else
 		echo "An error occured at grub step. Exiting..."
