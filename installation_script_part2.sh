@@ -11,6 +11,8 @@ SCRIPT="https://raw.githubusercontent.com/arghpy/suckless_progs/main/installatio
 # Programs to install
 PROGS_GIT="https://raw.githubusercontent.com/arghpy/suckless_progs/main/packages.csv"
 
+# local configuration
+CONFIG_GIT="https://github.com/arghpy/local_config"
 
 
 # Changing the language to english
@@ -123,13 +125,6 @@ main(){
 
 	systemctl enable NetworkManager
 
-	mv $(echo "/home/$NAME/zshrc.bkg") $(echo "/home/$NAME/.zshrc")
-	mv $(echo "/home/$NAME/config") $(echo "/home/$NAME/.config")
-	mv $(echo "/home/$NAME/local") $(echo "/home/$NAME/.local")
-	mv $(echo "/home/$NAME/profile") $(echo "/home/$NAME/.profile")
-	mv $(echo "/home/$NAME/xinitrc") $(echo "/home/$NAME/.xinitrc")
-	mv $(echo "/home/$NAME/vim") $(echo "/home/$NAME/.vim")
-	
 	echo "%wheel ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
 	XDG_DEFAULTS=$(grep -iE "^enabled" /etc/xdg/user-dirs.conf)
@@ -138,6 +133,8 @@ main(){
         cp copy.xdg /etc/xdg/user-dirs.conf
         rm copy.xdg
 
+	sudo -u "$NAME" git clone $CONFIG_GIT
+	sudo -u "$NAME" rm -rf local_config/.git local_config/README.md
 
 	for i in $(ls -l $(echo "/home/$NAME/.local/src") | awk '{print $NF}' | grep -v "yay\|lf\|icons");do
 		cd $i

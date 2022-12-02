@@ -234,10 +234,6 @@ main(){
 
 	cp $(which installation_script_part2.sh) /mnt/usr/local/bin/
 
-	rm -rf /mnt/etc/skel/*
-
-	cp -r /etc/skel/* /mnt/etc/skel/
-
 	arch-chroot /mnt
 
 }
