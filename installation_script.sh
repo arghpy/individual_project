@@ -177,9 +177,9 @@ formatting(){
 
 		ROOT_P=$(echo "$PARTITIONS" | grep -v "$BOOT_P\|$HOME_P")
 
-		mkswap $(echo "/dev/$BOOT_P")
-		mkfs.ext4 $(echo "/dev/$ROOT_P")
-		mkfs.ext4 $(echo "/dev/$HOME_P")
+		mkswap $(echo "/dev/$SWAP_P")
+		mkfs.ext4 -F $(echo "/dev/$ROOT_P")
+		mkfs.ext4 -F $(echo "/dev/$HOME_P")
 
 	else
 		echo "An error occured. Exiting..."
