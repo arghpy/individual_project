@@ -175,7 +175,7 @@ formatting(){
 
 		HOME_P=$(echo "$PARTITIONS" | tail -n1)
 
-		ROOT_P=$(echo "$PARTITIONS" | grep -v "$BOOT_P\|$HOME_P")
+		ROOT_P=$(echo "$PARTITIONS" | grep -v "$SWAP_P\|$HOME_P")
 
 		mkswap $(echo "/dev/$SWAP_P")
 		mkfs.ext4 -F $(echo "/dev/$ROOT_P")
