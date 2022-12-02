@@ -67,11 +67,10 @@ yay_install() {
 			sudo -u "$NAME" git pull --force origin master
 		}
 	cd "$REPODIR/yay" || exit 1
-	sudo -u "$NAME" -D "$REPODIR/yay" \
-		makepkg --noconfirm -si >/dev/null 2>&1 || return 1
+	sudo -u "$NAME" -D "$REPODIR/yay" makepkg --noconfirm -si >/dev/null 2>&1 || return 1
 
 	sudo -u "$NAME" wget $PROGS_GIT
-	sudo -u "$NAME" yay -S $(cat packages.csv | grep "AUR" | awk -F ',' '{print $1}' | paste -sd' ')
+	sudo -u "$NAME" yay --noconfirm -S $(cat packages.csv | grep "AUR" | awk -F ',' '{print $1}' | paste -sd' ')
 }
 
 
@@ -134,7 +133,9 @@ main(){
         rm copy.xdg
 
 	sudo -u "$NAME" git clone $CONFIG_GIT
-	sudo -u "$NAME" rm -rf local_config/.git local_config/README.md
+	sudo -u "$NAME" rm -rf $(echo "/home/$NAME/local_config/.git /home/$NAME/local_config/README.md")
+
+	for i in $(grep -r "arghpy" $(echo "/home/$NAME/.*") 2>/dev/null | awk -F ':' '{print $1}'); do sed $(echo "'s@arghpy@$NAME@g'") $i | grep "$NAME"; done
 
 	for i in $(ls -l $(echo "/home/$NAME/.local/src") | awk '{print $NF}' | grep -v "yay\|lf\|icons");do
 		cd $i
