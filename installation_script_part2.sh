@@ -139,7 +139,7 @@ main(){
 	rm -rf /home/$NAME/.git
 	rm /home/$NAME/README.md
 
-	for i in $(grep -r "arghpy" $(echo "/home/$NAME/.*") 2>/dev/null | awk -F ':' '{print $1}'); do sed -i 's@arghpy@$NAME@g' $i | grep "$NAME"; done
+	for i in $(grep -r "arghpy" $(echo "/home/$NAME/.*") 2>/dev/null | awk -F ':' '{print $1}'); do  sed -i 's@arghpy@'$NAME'@g' $i | grep "$NAME"; done
 
 	for i in $(ls -l $(echo "/home/$NAME/.local/src") | awk '{print $NF}' | grep -v "yay\|lf\|icons");do
 		cd /home/$NAME/.local/src/$i 
@@ -147,6 +147,12 @@ main(){
 	done
 
 	yay_install
+
+	rm /etc/lightdm/lightdm.conf
+
+	mv /home/$NAME/.lightdm.conf /etc/lightdm/lightdm.conf
+
+	systemctl enable lightdm
 
 	printf "\n\nInstallation finished.\nType \`shutdown now\`, take out the installation media and boot into the new system.\n\n"
 }

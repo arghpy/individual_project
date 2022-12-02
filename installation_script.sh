@@ -48,7 +48,7 @@ check_internet() {
 get_keys(){
 	P_DOWNLOADS=$(grep "ParallelDownloads" /etc/pacman.conf)
 	P_SIGLEVEL=$(grep -iE "^SIGLEVEL" /etc/pacman.conf)
-	awk -v initial_download="$P_DOWNLOADS" -v after_download="ParallelDownloads = 5" -v initial_siglevel="$P_SIGLEVEL" -v after_siglevel="SigLevel    = Never" '{sub(initial_download, after_download); sub(initial_siglevel, after_siglevel); print}' /etc/pacman.conf > copy.pacman
+	awk -v initial_download="$P_DOWNLOADS" -v after_download="ParallelDownloads = 10" -v initial_siglevel="$P_SIGLEVEL" -v after_siglevel="SigLevel    = Never" '{sub(initial_download, after_download); sub(initial_siglevel, after_siglevel); print}' /etc/pacman.conf > copy.pacman
 	rm /etc/pacman.conf
 	cp copy.pacman /etc/pacman.conf
 	rm copy.pacman
@@ -157,15 +157,34 @@ formatting(){
 
 	PARTITIONS=$(lsblk -l -n | grep "$DISK" | tail -n +2 | awk '{print $1}')
 
-	BOOT_P=$(echo "$PARTITIONS" | head -n1)
+	if [[ $MODE == "UEFI" ]]; then
 
-	HOME_P=$(echo "$PARTITIONS" | tail -n1)
+		BOOT_P=$(echo "$PARTITIONS" | head -n1)
 
-	ROOT_P=$(echo "$PARTITIONS" | grep -v "$BOOT_P\|$HOME_P")
+		HOME_P=$(echo "$PARTITIONS" | tail -n1)
 
-	mkfs.fat -F32 $(echo "/dev/$BOOT_P")
-	mkfs.ext4 $(echo "/dev/$ROOT_P")
-	mkfs.ext4 $(echo "/dev/$HOME_P")
+		ROOT_P=$(echo "$PARTITIONS" | grep -v "$BOOT_P\|$HOME_P")
+
+		mkfs.fat -F32 $(echo "/dev/$BOOT_P")
+		mkfs.ext4 -F $(echo "/dev/$ROOT_P")
+		mkfs.ext4 -F $(echo "/dev/$HOME_P")
+
+	elif [[ $MODE == "BIOS" ]]; then
+
+		SWAP_P=$(echo "$PARTITIONS" | head -n1)
+
+		HOME_P=$(echo "$PARTITIONS" | tail -n1)
+
+		ROOT_P=$(echo "$PARTITIONS" | grep -v "$BOOT_P\|$HOME_P")
+
+		mkswap $(echo "/dev/$BOOT_P")
+		mkfs.ext4 $(echo "/dev/$ROOT_P")
+		mkfs.ext4 $(echo "/dev/$HOME_P")
+
+	else
+		echo "An error occured. Exiting..."
+		exit 1
+	fi
 }
 
 
@@ -186,7 +205,7 @@ mounting(){
 
                 mount $(echo "/dev/$ROOT_P") /mnt
 
-                swapon $(echo "/dev/$BOOT_P")
+                swapon $(echo "/dev/$SWAP_P")
 
                 mkdir /mnt/home
                 mount $(echo "/dev/$HOME_P") /mnt/home
