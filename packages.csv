@@ -22,6 +22,7 @@ xorg-server,
 xorg-xwininfo,
 xorg-xinit,
 xorg-xprop,
+xorg-xinput,
 xwallpaper,
 xorg-xrandr,
 arandr,
@@ -71,6 +72,7 @@ proxychains,
 nmap,
 qalculate-gtk,
 zsh-autosuggestions,AUR
-zsh-autocomplete,AUR
+zsh-syntax-highlighting,AUR
+zsh-autocomplete-git,AUR
 ttf-font-awesome,
 noto-fonts,

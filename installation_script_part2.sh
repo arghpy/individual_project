@@ -139,7 +139,7 @@ main(){
         rm copy.xdg
 
 
-	for i in $(ls -l $(echo "/home/$NAME/.local/src") | awk '{print $NF}' | grep -v "yay");do
+	for i in $(ls -l $(echo "/home/$NAME/.local/src") | awk '{print $NF}' | grep -v "yay\|lf\|icons");do
 		cd $i
 		make clean install
 	done
