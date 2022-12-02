@@ -58,7 +58,6 @@ set_user() {
 #Install yay: script taken from Luke Smith
 
 yay_install() {
-	whiptail --infobox "Installing yay, an AUR helper..." 7 50
 	sudo -u "$NAME" mkdir -p "$REPODIR/yay"
 	sudo -u "$NAME" git -C "$REPODIR" clone --depth 1 --single-branch \
 		--no-tags -q "https://aur.archlinux.org/yay.git" "$REPODIR/yay" ||
@@ -67,7 +66,7 @@ yay_install() {
 			sudo -u "$NAME" git pull --force origin master
 		}
 	cd "$REPODIR/yay" || exit 1
-	sudo -u "$NAME" -D "$REPODIR/yay" makepkg --noconfirm -si >/dev/null 2>&1 || return 1
+	sudo -u "$NAME" -D "$REPODIR/yay" makepkg --noconfirm -si || return 1
 
 	sudo -u "$NAME" wget $PROGS_GIT
 	sudo -u "$NAME" yay --noconfirm -S $(cat packages.csv | grep "AUR" | awk -F ',' '{print $1}' | paste -sd' ')
@@ -116,7 +115,6 @@ main(){
 
 	set_user
 
-	yay_install
 
 	grub
 
@@ -132,15 +130,23 @@ main(){
         cp copy.xdg /etc/xdg/user-dirs.conf
         rm copy.xdg
 
-	sudo -u "$NAME" git clone $CONFIG_GIT
-	sudo -u "$NAME" rm -rf $(echo "/home/$NAME/local_config/.git /home/$NAME/local_config/README.md")
+	rm -rf /home/$NAME/* 
+	rm -rf /home/$NAME/.* 
+	sudo -u "$NAME" git -C /home/$NAME/ clone $CONFIG_GIT
+	mv /home/$NAME/local_config/* /home/$NAME/.
+	mv /home/$NAME/local_config/.* /home/$NAME/.
+	rm -rf /home/$NAME/local_config
+	rm -rf /home/$NAME/.git
+	rm /home/$NAME/README.md
 
-	for i in $(grep -r "arghpy" $(echo "/home/$NAME/.*") 2>/dev/null | awk -F ':' '{print $1}'); do sed $(echo "'s@arghpy@$NAME@g'") $i | grep "$NAME"; done
+	for i in $(grep -r "arghpy" $(echo "/home/$NAME/.*") 2>/dev/null | awk -F ':' '{print $1}'); do sed -i 's@arghpy@$NAME@g' $i | grep "$NAME"; done
 
 	for i in $(ls -l $(echo "/home/$NAME/.local/src") | awk '{print $NF}' | grep -v "yay\|lf\|icons");do
-		cd $i
+		cd /home/$NAME/.local/src/$i 
 		make clean install
 	done
+
+	yay_install
 
 	printf "\n\nInstallation finished.\nType \`shutdown now\`, take out the installation media and boot into the new system.\n\n"
 }
