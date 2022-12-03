@@ -48,7 +48,7 @@ check_internet() {
 get_keys(){
 	P_DOWNLOADS=$(grep "ParallelDownloads" /etc/pacman.conf)
 	P_SIGLEVEL=$(grep -iE "^SIGLEVEL" /etc/pacman.conf)
-	awk -v initial_download="$P_DOWNLOADS" -v after_download="ParallelDownloads = 10" -v initial_siglevel="$P_SIGLEVEL" -v after_siglevel="SigLevel    = Never" '{sub(initial_download, after_download); sub(initial_siglevel, after_siglevel); print}' /etc/pacman.conf > copy.pacman
+	awk -v initial_download="$P_DOWNLOADS" -v after_download="ParallelDownloads = 5" -v initial_siglevel="$P_SIGLEVEL" -v after_siglevel="SigLevel    = Never" '{sub(initial_download, after_download); sub(initial_siglevel, after_siglevel); print}' /etc/pacman.conf > copy.pacman
 	rm /etc/pacman.conf
 	cp copy.pacman /etc/pacman.conf
 	rm copy.pacman
