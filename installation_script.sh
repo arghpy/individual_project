@@ -37,6 +37,8 @@ check_internet() {
 				exit 1 
 				;;
 		esac
+
+		clear
 	
 	fi
 }
@@ -62,10 +64,10 @@ get_keys(){
 # Selecting the disk to install on
 
 disks(){
-	printf "\nSelect one of the options:\n\n"
-	lsblk -d -n | grep -v "loop" | awk '{print $1, $4}' | nl
+
+	OPT=$(whiptail --title "Disks" --inputbox "Choose an option(1/2/3/4....) with the disk to install to:\\n$(lsblk -d -n | grep -v "loop" | awk '{print $1, $4}' | nl -s ")   " ) \\nPlease be careful because this operation is not reversible." 10 60 3>&1 1>&2 2>&3 3>&1 )
 	OPTIONS=$(lsblk -d -n | grep -v "loop" | awk '{print $1, $4}' | nl | awk '{print $1}')
-	read OPT
+	clear
 }
 
 # Creating partitions

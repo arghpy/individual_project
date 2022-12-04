@@ -31,9 +31,9 @@ change_language(){
 # Setting the hostname
 
 set_hostname(){
-	SYS_HOSTNAME=$(whiptail --title "Set Hostname" --inputbox "Please enter a hostname for the system." 10 60 3>&1 1>&2 2>&3 3>&1)
+	printf "\n\nPlease enter a hostname for the system:\n\n"
+	read SYS_HOSTNAME
 	echo "$SYS_HOSTNAME" > /etc/hostname
-	clear
 }
 
 
@@ -42,7 +42,6 @@ set_hostname(){
 set_user() {
 	NAME=$(whiptail --inputbox "Please enter a name for the user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
 
-	clear
 	useradd -m -g wheel -s /bin/zsh "$NAME" >/dev/null 2>&1
 	usermod -a -G wheel "$NAME"
 	export REPODIR="/home/$NAME/.local/src"
