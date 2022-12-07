@@ -1,5 +1,5 @@
 # Suckless programs
 
-This repo was intended for personal use only but others make take an interest in it.
+This repository was initially created for personal use.
 
-It contains modified suckless programs for my needs.
+Now it is used to showcase my work for the Individual Project subject from our university.
