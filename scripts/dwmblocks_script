@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-
-cp /home/arghpy/.local/bin/dwmblocks_scripts/example /home/arghpy/.local/bin/dwmblocks_scripts/$1
-
-vim /home/arghpy/.local/bin/dwmblocks_scripts/$1

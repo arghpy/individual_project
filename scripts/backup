@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-rsync --timeout=600 -avh --progress --update --delete ~/.ssh ~/backup ~/.config ~/.local/bin ~/pictures ~/.profile ~/.zshrc ~/.xinitrc nas:/home/32bit/sync

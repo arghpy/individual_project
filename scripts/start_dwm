@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-
-while true; do
-	# Log dwm errors
-	/usr/local/bin/dwm 2> ~/.dwm.log
-done

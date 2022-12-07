@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-ssh-add /home/arghpy/.ssh/id_rsa_github

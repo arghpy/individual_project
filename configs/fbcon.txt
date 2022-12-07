@@ -1,2 +1,0 @@
-Grub options:
-loglevel=3 quiet fbcon=map:0
