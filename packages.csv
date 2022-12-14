@@ -1,83 +1,81 @@
-linux,repo
-linux-firmware,repo
-sof-firmware,repo
-alsa-ucm-conf,repo
-base,repo
-base-devel,repo
-bluez,repo
-bluez-utils,repo
-man-db,repo
-man-pages,repo
-wget,repo
-vim,repo
-git,repo
-zsh,repo
-htop,repo
-scrot,repo
-lf,AUR
-bat,repo
-thunar,repo
-openssh,repo
-ueberzug,repo
-picom,repo
-dunst,repo
-xorg-server,repo
-xorg-xwininfo,repo
-xorg-xinit,repo
-xorg-xprop,repo
-xorg-xinput,repo
-xwallpaper,repo
-xorg-xrandr,repo
-arandr,repo
-dosfstools,repo
-polkit,repo
-libnotify,repo
-exfat-utils,repo
-mpv,repo
-vlc,repo
-ntfs-3g,repo
-nitrogen,repo
-sxiv,repo
-bc,repo
-brightnessctl,repo
-aspell,repo
-xdg-user-dirs,repo
-xclip,repo
-pulsemixer,repo
-pamixer,repo
-wireplumber,repo
-pipewire-pulse,repo
-sysstat,repo
-lightdm,repo
-lightdm-gtk-greeter,repo
-xinit-xsession,AUR
-blueman,repo
-networkmanager,repo
-unzip,repo
-p7zip,repo
-zathura-pdf-mupdf,repo
-earlyoom,repo
-python-pip,repo
-lm_sensors,repo
-ffmpegthumbnailer,repo
-noto-fonts,repo
-fzf,repo
-atool,repo
-mediainfo,repo
-lynx,repo
-poppler,repo
-gnome-epub-thumbnailer,repo
-odt2txt,repo
-gnupg,repo
-gummi,repo
-selectdefaultapplication-git,AUR
-proxychains,repo
-nmap,repo
-qalculate-gtk,repo
-zsh-autosuggestions,AUR
-zsh-syntax-highlighting,AUR
-zsh-autocomplete-git,AUR
-ttf-font-awesome,repo
-noto-fonts,repo
-firefox,repo
-dmidecode,repo
+linux,repo,Linux Kernel
+linux-firmware,repo,Firmware for different components
+sof-firmware,repo,Firmware for audio chips
+alsa-ucm-conf,repo,Additional firmware for additional audio chips
+base,repo,The base packages for having a minimal functioning linux system
+base-devel,repo,Additional packages for system administration purposes and other additional packages
+bluez,repo,Support for bluetooth
+bluez-utils,repo,Tools for managing bluetooth connection and devices
+man-db,repo,Manual database for command-line utilities and tools
+man-pages,repo,Manual pages for command-line utilities and tools
+wget,repo,command-line utility for downloading files from the web
+vim,repo,Powerful keyboard based editor
+git,repo,Version control system
+zsh,repo,Powerfull command-line shell similar to bash but with many additional features
+htop,repo,Command-line program used for monitoring system resources and processes
+scrot,repo,Small command-line utility used for taking screenshots
+lf,AUR,Command-line program used for navigating directories within the terminal
+bat,repo,Command-line utility similar with `cat` but with a nicer output
+thunar,repo,Graphical File Manager
+openssh,repo,SSH server
+ueberzug,repo,Enables previews in the lf file manager
+picom,repo,Graphical compositor used for transperency and removes screen-tearing
+dunst,repo,Lightweight notification syste,
+xorg-server,repo,Is the graphical servevr
+xorg-xwininfo,repo,Queries information about windows
+xorg-xinit,repo,Starts the graphical server
+xorg-xprop,repo,Used for detecting window properties
+xorg-xinput,repo,Used for modifying parameters of input sources
+xwallpaper,repo,Sets the wallpaper
+xorg-xrandr,repo,Configure windows size, positioning etc
+arandr,repo,Graphical adjuster of windows
+dosfstools,repo,Allows the computer to access dos-like systems
+polkit,repo,Manages user policies
+libnotify,repo,Allows desktop notifications
+exfat-utils,repo,Allows management of fat drives
+mpv,repo,Video Player
+vlc,repo,Video Player with more codecs and more features
+ntfs-3g,repo,Allows accessing ntfs partitions
+nitrogen,repo,Graphical wallpaper manager
+sxiv,repo,Lightweight image viewer
+bc,repo,Terminal calculator
+brightnessctl,repo,Used for managing window brightness
+aspell,repo,Used for correcting text gramatically
+xdg-user-dirs,repo,Sets the defaults folder icon (e.g. Documents, Music)
+xclip,repo,Clipboard manager for X
+pulsemixer,repo,Audio Controller
+wireplumber,repo,Audio system
+pipewire-pulse,repo,Gives pipewire compatibility with PulseAudio programs
+sysstat,repo,System statistics
+lightdm,repo,Login manager
+lightdm-gtk-greeter,repo,Login manager greeter
+xinit-xsession,AUR,Define sessions within X
+blueman,repo,Grpahical manager for bluetooth
+networkmanager,repo,Network Manager
+unzip,repo,Used to unzip 7z files
+p7zip,repo,More features to work with 7z files
+zathura-pdf-mupdf,repo,Lightweight pdf viewer and much more
+earlyoom,repo,Service to prevernt Out Of Memory events
+python-pip,repo,To install pip libraries and python programs
+lm_sensors,repo,Gets the values for different parameters of the system (e.g. Temp)
+ffmpegthumbnailer,repo,Creates thumbnail previews of video files
+noto-fonts,repo,Additional font
+fzf,repo,Fuzzy finder for searching quick for files
+atool,repo,Manages and gives information about archives
+mediainfo,repo,Shows audio and video information
+lynx,repo,CLI web browser
+poppler,repo,Manipulates .pdfs and gives .pdf previews and other .pdf functions.
+gnome-epub-thumbnailer,repo,Used for displaying other thumbnails in lf file manager
+odt2txt,repo,Used for displaying odt files in lf file manager
+gnupg,repo,Cryptography puropses
+gummi,repo,Graphical application for writing LaTeX files
+selectdefaultapplication-git,AUR,Used for selecting default application
+proxychains,repo,For routing internet traffic through proxies
+nmap,repo,Auditing tool for networks
+qalculate-gtk,repo,Graphical calculator
+zsh-autosuggestions,AUR,Enables autosuggestions in zsh
+zsh-syntax-highlighting,AUR,Enables syntax-highlighting in zsh
+zsh-autocomplete-git,AUR,Enables autocomplete in zsh
+ttf-font-awesome,repo,More fonts
+firefox,repo,Web browser
+dmidecode,repo,Get additional information about hardware
