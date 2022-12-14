@@ -41,7 +41,7 @@ sxiv,repo,Lightweight image viewer
 bc,repo,Terminal calculator
 brightnessctl,repo,Used for managing window brightness
 aspell,repo,Used for correcting text gramatically
-xdg-user-dirs,repo,Sets the defaults folder icon (e.g. Documents, Music)
+xdg-user-dirs,repo,Sets the defaults folder icon (e.g. Documents/Music)
 xclip,repo,Clipboard manager for X
 pulsemixer,repo,Audio Controller
 wireplumber,repo,Audio system
