@@ -20,7 +20,7 @@ thunar,repo,Graphical File Manager
 openssh,repo,SSH server
 ueberzug,repo,Enables previews in the lf file manager
 picom,repo,Graphical compositor used for transperency and removes screen-tearing
-dunst,repo,Lightweight notification syste,
+dunst,repo,Lightweight notification system
 xorg-server,repo,Is the graphical servevr
 xorg-xwininfo,repo,Queries information about windows
 xorg-xinit,repo,Starts the graphical server
