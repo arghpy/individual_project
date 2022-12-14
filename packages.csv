@@ -1,3 +1,4 @@
+Package,Source,Description
 linux,repo,Linux Kernel
 linux-firmware,repo,Firmware for different components
 sof-firmware,repo,Firmware for audio chips

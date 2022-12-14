@@ -222,7 +222,7 @@ mounting(){
 
 install_packages(){
 	wget $PROGS_GIT
-	pacstrap -K /mnt $(cat packages.csv | grep -v "AUR\|GIT" | awk -F ',' '{print $1}' | paste -sd' ')
+	pacstrap -K /mnt $(tail packages.csv -n +2 | grep -v "AUR\|GIT" | awk -F ',' '{print $1}' | paste -sd' ')
 }
 
 
