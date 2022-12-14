@@ -27,7 +27,7 @@ xorg-xinit,repo,Starts the graphical server
 xorg-xprop,repo,Used for detecting window properties
 xorg-xinput,repo,Used for modifying parameters of input sources
 xwallpaper,repo,Sets the wallpaper
-xorg-xrandr,repo,Configure windows size, positioning etc
+xorg-xrandr,repo,Configure windows size/positioning etc
 arandr,repo,Graphical adjuster of windows
 dosfstools,repo,Allows the computer to access dos-like systems
 polkit,repo,Manages user policies
