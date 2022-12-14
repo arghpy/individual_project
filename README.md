@@ -1,4 +1,4 @@
-# Suckless programs
+# Individual project
 
 This repository was initially created for personal use.
 
