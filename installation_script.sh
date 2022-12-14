@@ -112,7 +112,7 @@ FDISK_CMDS
                 MODE="BIOS"
 
         sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
-o      # create new GPT partition
+o      # create new MBR partition
 n      # add new partition
        # partition type
        # partition number
