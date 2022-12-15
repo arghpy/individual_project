@@ -251,7 +251,7 @@ main(){
 	genfstab -U /mnt >> /mnt/etc/fstab
 
 
-	printf "\n\nNow entering the system.\n\nThe boot mode is: %s.\n\nTo continue with the installation process execute the script installation_script_part2.sh specifying the mode.\n\n# installation_script_part2.sh BIOS\n\n# installation_script_part2.sh UEFI\n\n" "$MODE"
+	printf "\n\nNow entering the system.\n\nThe boot mode is: %s.\n\nTo continue with the installation process execute the script installation_script_part2.sh specifying the mode.\n\nExample\n\n$: installation_script_part2.sh BIOS\n\n$: installation_script_part2.sh UEFI\n\n" "$MODE"
 
 	cp $(which installation_script_part2.sh) /mnt/usr/local/bin/
 
