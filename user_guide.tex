@@ -1,0 +1,149 @@
+\documentclass[11pt]{article}
+\usepackage[english]{babel}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+    \title{\textbf{User Guide}}
+    \author{Andrei Suba\\
+    Computer Science Student,\\
+	West University of Timișoara,\\
+	Timișoara, Romania\\
+	\textbf{Email:} \texttt{andrei.suba00@e-uvt.ro}
+    }
+    \date{}
+    
+    \addtolength{\topmargin}{-3cm}
+    \addtolength{\textheight}{3cm}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\clearpage
+
+\tableofcontents
+
+\clearpage
+
+\section{Welcome!}
+This user guide was created for the Individual Project subject at my university and it's meant
+to describe my work for the past few months.\\
+The project it's about a new linux distribution based on \href{https://archlinux.org/}{Arch Linux} which
+follows the same design of minimalism with regards to its lightweight functioning and flexibility.\\
+This linux distribution comes with a lightweight tiling window manager created by the \href{https://suckless.org/}{Suckless Team} named \texttt{dwm} and other tools like \texttt{dmenu}, \texttt{st} and \texttt{slock}.\\
+The implementation of their software and others will be explained thoroughly in the next sections.\\
+\newline
+Disclaimer: this work began a long time ago just as a personal project out of curiosity after going down the 
+rabbit hole of minimalism setups. Shoutouts to \href{https://lukesmith.xyz/}{Luke Smith}!
+
+\section{Basic goals and principles of this system}
+
+\noindent\textbf{Economy}
+\newline
+Programs should be simple and light on system resources and highly e xtensible.
+Because of this, many are terminal or small ncurses programs that have all the magic inside
+of them.
+\newline
+\newline
+\noindent\textbf{Keyboard}
+\newline
+All terminal programs (and other programs) use vim keys when possible. Your hands could never need to leave the keyboard, increasing the proficiency once the user gets used to it.
+\newline
+\newline
+\noindent\textbf{Decentralization}
+\newline
+This system is a web of small, modifiable and replaceable programs that users can easily customize.
+
+\section{Status bar}
+
+The status bar is created through scripts which are to be added in the configuration file of \texttt{Dwmblocks}.\\
+The output of the scripts is the one displayed. The status bar is composed as
+follows (from left to right):
+\begin{itemize}
+	\item \textbf{RAM}: it displays the currently utilized RAM. 
+	\item \textbf{Battery}: displays the battery level 
+	\item \textbf{Volume}: it displays the volume as a percentage 
+	\item \textbf{Internet}: if there is no internet connection,
+	it displays just the wifi icon. If there is a connection it displays based on the connection type: 
+	\begin{itemize}
+		\item \textbf{Ethernet}: an ethernet icon followed by "Eth"
+		\item \textbf{Wifi}: an wifi icon followed by the SSID (wifi name)
+	\end{itemize}
+	\item \textbf{Date}: date and time
+	\item \textbf{Help}: access to this user guide
+\end{itemize}
+
+\subsection{Interactions}
+
+The status bar has a patch that allows it's modules to be clickable, that
+meaning that if you hover your mouse over any of the modules and press either
+\texttt{Left Click}, \texttt{Right Click} or \texttt{Shift + Left Click}, these
+actions will happen:
+\begin{itemize}
+	\item \texttt{Left Click}: sends a desktop notification with additional
+	information 
+	\item \texttt{Right Click}: depending on the script, the following will 
+	happen:
+	\begin{itemize}
+		\item \textbf{RAM}: program \texttt{htop} will open for a more
+		detailed view of RAM consumption, CPU load and processes
+		\item \textbf{Volume}: program \texttt{pavucontrol} will open to
+		control more aspects regarding audio devices
+		\item \textbf{Internet}: program \texttt{nmtui} will open to allow
+		the user to connect to a wifi network
+		\item \textbf{Help}: will open this user guide
+	\end{itemize}
+	\item \texttt{Shift + Left Click}: it will open up in vim the script that
+	is producing the output
+\end{itemize}
+
+\section{Key bindings}
+
+In the examples below, \texttt{Mod} refers to the "Windows key" or Super Key.
+\newline
+\begin{itemize}
+	\item \texttt{Mod} + \texttt{Enter} : open st teminal
+	\item \texttt{Mod} + \texttt{Q} : exit application
+	\item \texttt{Mod} + \texttt{Shift} + \texttt{Q} : restart dwm
+	\item \texttt{Mod} + \texttt{Shift} + \texttt{L} : lock screen
+	\newline
+	\newline
+	\underline{NOTE}: in order to unlock the screen, you will need
+	to just type your user's password and press \texttt{Enter}. If you
+	mess up the password just press \texttt{Enter} and type it again
+	until you succeed.
+	\item \texttt{Mod} + \texttt{W} : open firefox (web browser)
+	\item \texttt{Mod} + \texttt{Shift} + \texttt{w} : open lynx (terminal web browser)
+	\item \texttt{Mod} + \texttt{D} : launch dmenu (to run programs)
+	\item \texttt{Mod} + \texttt{O} : launch lf (terminal based file manager)
+	\item \texttt{Mod} + \texttt{Shift} + \texttt{O} : launch thunar (graphical file manager)
+	\item \texttt{Mod} + \texttt{-} : decrease volume by 5\%
+	\item \texttt{Mod} + \texttt{+/=} : increase volume by 5\%
+	\item \texttt{Mod} + \texttt{Shift} + \texttt{-} : decrease brightness by 5\%
+	\item \texttt{Mod} + \texttt{Shift} + \texttt{+/=} : increase brightness by 5\%
+	\item \texttt{Mod} + \texttt{J/K} : browse through applications in the same window
+	\item \texttt{Mod} + \texttt{H/L} : increase/decrease window size
+	\item \texttt{Mod} + \texttt{N/B} : go next/back through tags
+	\item \texttt{Mod} + \texttt{Tab} : switch between current and previous tag
+	\item \texttt{Mod} + \texttt{Space} : switch focus of window
+	\item \texttt{Mod} + \texttt{1/2/3/4/5} : switch to tag 1/2/3/4/5
+	\item \texttt{Mod} + \texttt{Shift} + \texttt{1/2/3/4/5} : move application to tag 1/2/3/4/5	
+\end{itemize}
+
+\section{Tips}
+
+In order to select the way the screens are arranged and display,
+the script \texttt{displayselect} may be useful.\\
+Run it from terminal or with \texttt{dmenu} (the application runner).
+
+\section{Conclusion}
+The project successfully combined the minimalist philosophy of the suckless community with the flexible and powerful Arch
+Linux operating system. By carefully selecting and installing a range of software from the suckless community and other software that shares the same philosophy, a custom Linux distribution emerged that prioritized simplicity, efficiency, and customization. This project serves as a confirmation to the value of minimalist and efficient design.\\
+\newline
+This project was a rewarding and satisfying experience for me because it\\
+integrates different values that I care for like minimalism and open-source\\
+software. It challenged me to think creatively and critically about different approaches to accomplish this result.
+
+
+\end{document}
+

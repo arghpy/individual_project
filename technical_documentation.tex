@@ -1,0 +1,626 @@
+\documentclass{article}
+\usepackage{lmodern}
+\usepackage[english]{babel}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+    \title{\textbf{Technical Documentation}}
+    \author{Andrei Suba\\
+    Computer Science Student,\\
+	West University of Timișoara,\\
+	Timișoara, Romania\\
+	\textbf{Email:} \texttt{andrei.suba00@e-uvt.ro}
+    }
+    \date{}
+    
+    \addtolength{\topmargin}{-3cm}
+    \addtolength{\textheight}{3cm}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=C,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\clearpage
+
+\tableofcontents
+
+\clearpage
+
+\section{Introduction}
+
+This technical documentation was created for the Individual Project subject at my university and it's meant
+to describe my work for the past few months.\\
+The project it's about an automatic script base configuration based on \href{https://archlinux.org/}{Arch Linux} which
+follows the same design of minimalism with regards to its lightweight functioning and flexibility.\\
+This linux distribution comes with a lightweight tiling window manager created by the \href{https://suckless.org/}{Suckless Team} named \texttt{dwm} and other tools like \texttt{dmenu}, \texttt{dwmblocks}, \texttt{st} and \texttt{slock}.\\
+The implementation of their software and others will be explained thoroughly in the next sections.\\
+\newline
+Disclaimer: this work began a long time ago just as a personal project out of curiosity after going down the 
+rabbit hole of minimalism setups. Shoutouts to \href{https://lukesmith.xyz/}{Luke Smith}!
+
+\clearpage
+
+\section{Installation process}
+
+\subsection{Pre-installation} \label{preinstallation}
+
+There are two ways of installing the operating system and all configuration:
+\begin{itemize}
+	\item \textbf{Getting the iso file}: directly burn the custom .iso file to an external media and boot from it. Run \textbf{installation\_script.sh}:
+	\begin{lstlisting}
+		$: installation_script.sh
+	\end{lstlisting}
+	\item \textbf{Any Arch Linux iso}: get the current iso of Arch Linux, burn it to an external media, booting from it and follow the below steps:
+	\begin{enumerate}
+		\item First of all make sure that you have access to the internet.\\
+		Follow the steps described here for help: \href{https://wiki.archlinux.org/title/Installation_guide#Connect_to_the_internet}{Internet connection}
+		\item Initialize the keys: run the following commands
+		\lstset{language=bash}
+		\begin{lstlisting}
+	#Initialize the local key
+	$: pacman-key --init
+
+	#Download the keyring
+	$: pacman -Sy
+		\end{lstlisting}
+		\item Install git:
+		\begin{lstlisting}
+	#Install git
+	$: pacman --noconfirm -S git		
+		\end{lstlisting}
+		
+		\item Clone the following repository: \href{https://github.com/arghpy/individual_project}{https://github.com/arghpy/individual\_project}:
+		\begin{lstlisting}
+		$: git clone https://github.com/arghpy/individual_project
+		\end{lstlisting}
+		\lstset{language=C}
+		\item Change directory into it:
+		\begin{lstlisting}
+			$: cd individual_project
+		\end{lstlisting}
+		\item Move both the \texttt{installation\_script.sh} and \texttt{installation\_script\_part2.sh} into \texttt{/usr/local/bin/}:
+		\begin{lstlisting}
+			$: mv installation_script.sh /usr/local/bin/
+			$: mv installation_script_part2.sh /usr/local/bin/
+		\end{lstlisting}
+		\item Remove the cloned directory:
+		\begin{lstlisting}
+			$: rm -rf individual_project
+		\end{lstlisting}
+		\item Run \texttt{installation\_script.sh} and follow the steps:
+		\begin{lstlisting}
+			$: installation_script.sh
+		\end{lstlisting}
+	\end{enumerate}
+\end{itemize}
+
+\subsection{Installing the system}
+
+The installation process is done in two parts: first, the \texttt{installation\_script.sh} is run, and after it finishes it displays a description on how the second part should be run (\texttt{installation\_script\_part2.sh}).
+\newline
+\newline
+\textbf{NOTE}: the installation is not fully automated. It will still need interaction with the user, waiting in different parts for it's input/ 
+\subsubsection{installation\_script.sh}
+
+After the user gets successfully past the \ref{preinstallation} step and runs the \texttt{installation\_script.sh} script, those will be the steps followed by the user:
+\begin{enumerate}
+	\item \textbf{Internet}: first of all, the script will check for an internet connection by pinging the primary DNS of google (8.8.8.8). If it fails, the user will be prompted to check it's internet connection, point in which two options are possible to choose:
+	\begin{itemize}
+		\item \textbf{Retry}: the pinging will be repeated
+		\item \textbf{nmtui}: for wifi connection. The steps that follow after launching it are simple to understand.
+	\end{itemize}
+	\item \textbf{Keys and configuring pacman}: it initializes a local key for pacman (package manager) and downloads all the signing keys from the Arch Linux developers. It also increasing the number of parallel downloads to 5. 
+	\item \textbf{Choosing installation disks}: it check for the disks on the system on which the installation will be performed. The user will be prompted to choose the installation media from a menu which is displaying both the disk name (sda, sdb, nvme...) and their size, for the user to be able to differentiate them.\\
+	\newline
+	\underline{\textbf{IMPORTANT NOTE}}: \textbf{Please be careful when selecting the disk! After choosing it, all the data will be formated and the disk will be partitioned!}
+	\item \textbf{Partitioning}: the disk is going to be partitioned accordingly with their system boot mode: \textit{BIOS} or \textit{UEFI}. Following is the partition scheme for each boot mode:
+	\begin{itemize}
+		\item \textbf{BIOS}: the disk will be partitioned on an MBR mode as follows:
+		\begin{itemize}
+			\item \texttt{SWAP}: 4GB
+			\item \texttt{ROOT}: 30GB
+			\item \texttt{HOME}: space left
+		\end{itemize}
+		\item \textbf{UEFI}: the disk will be partitioned on an GPT mode as follows:
+		\begin{itemize}
+			\item \texttt{BOOT}: 1GB
+			\item \texttt{ROOT}: 30GB
+			\item \texttt{HOME}: space left
+		\end{itemize}
+	\end{itemize}
+	\item \textbf{Formatting}: depending on the boot mode (\textit{BIOS} or \textit{UEFI}) the following formatting will be performed:
+	\begin{itemize}
+		\item \textbf{BIOS}: the disk will be formatted as follows:
+		\begin{itemize}
+			\item \texttt{SWAP}: [SWAP]
+			\item \texttt{ROOT}: EXT4
+			\item \texttt{HOME}: EXT4
+		\end{itemize}
+		\item \textbf{UEFI}: the disk will be formatted as follows:
+		\begin{itemize}
+			\item \texttt{BOOT}: FAT32
+			\item \texttt{ROOT}: EXT4
+			\item \texttt{HOME}: EXT4
+		\end{itemize}
+	\end{itemize}
+	\item \textbf{Mounting the partitions}: depending on the boot mode (\textit{BIOS} or \textit{UEFI}) the following mounting point will be defined and partitions will be mounted:
+	\begin{itemize}
+		\item \textbf{BIOS}: mounting points:
+		\begin{itemize}
+			\item \texttt{SWAP}: the swap will be activated
+			\item \texttt{ROOT}: /mnt
+			\item \texttt{HOME}: /mnt/home
+		\end{itemize}
+		\item \textbf{UEFI}: mounting points:
+		\begin{itemize}
+			\item \texttt{BOOT}: /mnt/boot
+			\item \texttt{ROOT}: /mnt
+			\item \texttt{HOME}: /mnt/home
+		\end{itemize}
+	\end{itemize}
+	\item \textbf{Installing packages}: the script will download \href{https://github.com/arghpy/individual_project/blob/main/packages.csv}{packages.csv} file and based on it, it will install all packages that are from the repository into the new system.
+	\item \textbf{Automatically mounting partitions at boot}: the script will generate the fstab file (File System Table) for the new system such that the newly created system will be able to recognize it's partitions and mount them.
+	\item \textbf{Finish}: after the previous step, the script will print a description that exemplifies what the user should be doing next (how to run\\ \texttt{installation\_script\_part2.sh} based on the boot mode automatically identified before - \textit{BIOS} or \textit{UEFI}).\\
+	After the description is displayed, the script will change the root directory to the new system.
+	
+\end{enumerate}
+
+\subsubsection{installation\_script\_part2.sh}
+
+This part continues immediately after the \texttt{installation\_script.sh} finished.\\
+The user should already be located in the newly installed system, viewing above the prompt the following text:
+\begin{verbatim}
+Now entering the system.
+
+The boot mode is: UEFI.
+
+To continue with the installation process execute the script
+installation_script_part2.sh specifying the mode.
+Example:
+
+$: installation_script_part2.sh BIOS
+
+$: installation_script_part2.sh UEFI
+
+\end{verbatim}
+
+\noindent \textbf{NOTE}: in this example the boot mod is \textit{UEFI}, but depending on the system this value can
+also be \textit{BIOS}.
+\newline
+
+\noindent Below are the next steps done by the installation script:
+\begin{enumerate}
+	\item \textbf{Keys initialization}: during this step, the following commands are executed in order to create 
+	a local pacman key and register the keys of the developers:
+	\begin{lstlisting}
+     pacman-key --init
+     pacman -Sy
+     pacman-key --populate archlinux
+	\end{lstlisting}
+	
+	\item \textbf{Setting the time}: the time is set for Europe/Bucharest by creating a symbolic link from
+	\texttt{/usr/share/zoneinfo/Europe/Bucharest} to\\
+	\texttt{/etc/localtime}. In this step the hardware clock is also synced with the system time.
+	
+	\item \textbf{Language}: the language is set to \textit{English US}.
+	
+	\item \textbf{Hostname}: the user will be prompted to type the hostname of the system (name of the station
+	, viewed by the local network).
+	
+	\item \textbf{User}: the user will be prompted to type the name of the local user on the system. In this step
+	the script will create a local user based on the name typed before. After the user is created, the script will
+	ask for the password for the newly created user. Please note that the password will need to be typed twice.
+	
+	\item \textbf{GRUB}: \textit{GRUB} is installed in this step and the system will be set to boot using it.\\
+	\newline
+	\underline{NOTE}: this step configures GRUB based on the boot mode. That's why the installation script in
+	this part needs to be run with an argument.\\
+	\textbf{Be careful} to the argument which is provided to the script.\underline{\textit{Double-check!}} 
+	
+	\item \textbf{Services}: the \textit{Network Manager} service is started and enabled in order for the new
+	system to have access to internet.
+	
+	\item \textbf{Default directories}: the file \texttt{/etc/xdg/user-dirs.conf} is modified such that upon
+	creating any new users, just the contents of \texttt{/etc/skel} will be copied into the home directory.
+	
+	\item \textbf{Setting the home directory}: additional files are added to the user's home directory,
+	files which are copied from the GitHub repository:\\
+	\href{https://github.com/arghpy/local_config}{local\_config}.\\
+	\newline Those files contain the configuration that will be binded with programs installed in the first part
+	of the installation, constructing the environment.
+	
+	\item \textbf{Compiling Suckless software}: the script goes in the directory \texttt{~/.local/src},
+	searches for the directories \texttt{dwm, dwmblocks, dmenu, st} and \texttt{slock}, goes into each of them
+	and builds them.
+	
+	\item \textbf{AUR software}: \texttt{AUR} stands Arch User Repository. In this step, the script installs
+	additional software that can be found only in AUR. This installation is done using \texttt{yay}: a
+	command-line tool used for managing software from AUR.
+	
+	\item \textbf{Login Manager}: the \texttt{lightdm} login manager is installed and enabled. It's lightweight,
+	simple and easy to configure. It's also a graphical login manager.
+	
+	\item \textbf{EarlyOOM}: in this step the script enables \texttt{earlyoom} which is a service used to stop an
+	OutOfMemory event by monitoring the RAM usage.
+	
+	\item \textbf{Finish}: this is the final step of the installation. The user will see the message:
+	\begin{lstlisting}
+	Installation finished.
+	Type `exit` to get out of chroot and after that type
+	`shutdown now`, take out the installation media and boot into
+	the new system.
+	\end{lstlisting}
+	After the steps described are performed, all of the installation finished, and the system is ready. 
+\end{enumerate}
+ 
+\clearpage
+\section{Arch Linux}
+
+In conformity with the Arch development team's \href{https://wiki.archlinux.org/title/Arch_Linux}{view},
+\newline
+"Arch Linux is an independently developed, x86-64 general-purpose GNU/Linux distribution that strives to provide the latest stable versions of most software by following a rolling-release model. The default installation is a minimal base system, configured by the user to only add what is purposely required."
+\newline
+\newline
+This minimalist distribution of linux is highly popular for its customizability and was developed by having the following principles in mind: simplicity, modernity, pragmatism, user centrality and versatility.
+\newline
+Because of the above princpiles many users choose to use this distribution as their main distribution, myself included.
+Given the power to the user and being minimal, it provided me and many others the means to customize it to fit our personal needs and beliefs. 
+
+\clearpage
+\section{Suckless software}
+
+The suckless.org community is a group of developers who create and maintain a collection of minimalist and efficient software programs. The community was founded by the developers of the DWM window manager, and has since grown to include a variety of software projects that adhere to the suckless philosophy. The community's goal is to create simple and efficient software that is easy to understand and customize, while avoiding unnecessary features or bloat.
+\newline
+\newline
+The suckless.org community is known for its focus on minimalism and simplicity, and its software projects are often designed to do one thing well and avoid unnecessary features. The community also emphasizes the use of clean and readable code, and encourages users to customize and modify the software to suit their own needs.
+\newline
+\newline
+Some of the most popular software projects developed by the suckless.org community include the DWM and ST window managers, the dmenu application launcher, and the sutils collection of command-line utilities. All of these projects are available as free and open-source software, and are widely used by users of Linux and other Unix-like operating systems.
+\newline
+\newline
+DWM, Dwmblocks and ST as well as other programs compiled from source can be found in the user's home directory under \texttt{.local/src/}. 
+\begin{lstlisting}
+.local/src
+.local/src/yay
+.local/src/dmenu
+.local/src/dwmblocks
+.local/src/st
+.local/src/dwm
+.local/src/slock
+\end{lstlisting}
+\subsection{DWM}
+
+DWM is a dynamic window manager for the X Window System. It is a lightweight and minimalistic window manager that is designed to be fast and efficient, and is often used in conjunction with a tiling window manager. DWM is written in C and is highly customizable, allowing users to configure and modify its behavior to suit their preferences.
+\newline
+\newline
+DWM is known for its simplicity and efficiency, and is often used by users who want a fast and lightweight window manager that can be easily customized. Some of the key features of DWM include:
+\begin{itemize}
+	\item \textbf{Tiling layout}: DWM automatically arranges windows in a tiled layout, which can make it easier to manage multiple windows and improve productivity.
+	\item \textbf{Customizable appearance}: allows users to customize its appearance, including the colors, font, and layout of the window decorations.
+	\item \textbf{Keyboard-based navigation}: can be controlled entirely from the keyboard, which can make it faster and more efficient to use.
+	\item \textbf{Extensibility}: is highly customizable, and users can easily add new features or modify its behavior by writing their own patches or scripts.
+\end{itemize}
+The configuration file for DWM is found under \texttt{.local/src/dwm} with the name \texttt{config.h}. The patches applied on the original DWM software are found in \texttt{.local/src/dwm/patches} and include:
+\begin{itemize}
+	\item \textbf{fullgaps}: used to implement gaps between windows within the same tag
+	\item \textbf{colorbar}: for adding colors to the Dwmblocks status bar
+	\item \textbf{statuscmd}: it is used to create a link between DWM and Dwmblocks
+	\item \textbf{systray}: added in order for applets to be displayed (e.g.: \texttt{nm-applet})
+\end{itemize}
+
+
+\noindent The \texttt{config.h} file contains the following personal additions: 
+\newline
+
+\noindent\textbf{Font size}:
+\begin{lstlisting}
+static const char *fonts[]          = { "monospace:size=14" };
+static const char dmenufont[]       = "monospace:size=14";
+\end{lstlisting}
+
+\noindent\textbf{Colors in hex format}:
+\begin{lstlisting}
+static const char col_black[]       = "#000000";
+static const char col_gray1[]       = "#222222";
+static const char col_gray2[]       = "#444444";
+static const char col_gray3[]       = "#bbbbbb";
+static const char col_gray4[]       = "#eeeeee";
+static const char col_gray5[]       = "#3f4e4f";
+static const char col_cyan[]        = "#005577";
+static const char col_cyan2[]       = "#a5c9ca";
+static const char col_black1[]      = "#2c3333";
+static const char col_black2[]      = "#2c3639";
+static const char col_BlGreen[]  = "#3f4e4f";
+static const char col_violet[]      = "#51557e";
+static const char col_blue1[]       = "#395b64";
+static const char col_blue2[]       = "#00a8cc";
+static const char col_blue3[]       = "#151965";
+static const char col_blue4[]       = "#007880";
+static const char col_blue5[]       = "#2d6e7e";
+static const char col_blue6[]       = "#1597bb";
+static const char col_white2[]      = "#e7f6f2";
+\end{lstlisting}
+Which are to be added in:
+\begin{lstlisting}
+static const char *colors[][3]      = {
+        /*               fg         bg         border   */
+        /*[SchemeNorm] = { col_gray3, col_gray1, col_gray2 }, ORIGINAL */
+        [SchemeNorm] = { col_white2, col_BlackGreen, col_gray2 },
+        /*[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  }, ORIGINAL */
+        [SchemeSel]  = { col_white2, col_BlackGreen,  col_cyan  },
+        [SchemeStatus]  = { col_white2, col_gray1,  "#000000"  },
+        [SchemeTagsSel]  = { col_black, col_cyan2,  "#000000"  },
+        [SchemeTagsNorm]  = { col_gray3, col_gray1,  "#000000"  },
+        [SchemeInfoSel]  = { col_gray4, col_cyan,  "#000000"  },
+        [SchemeInfoNorm]  = { col_gray3, col_gray1,  "#000000"  },
+
+};
+\end{lstlisting}
+
+\noindent\textbf{Number of tags and name}:
+\begin{lstlisting}
+static const char *tags[] = { "1", "2", "3", "4", "5" };
+\end{lstlisting}
+
+\noindent\textbf{Calling programs and local scripts}:
+\begin{lstlisting}
+static const char *termcmd[]  = { "st", NULL };
+static const char *firefox[]  = { "/usr/bin/firefox", NULL};
+static const char *lynx[]  = { "/home/$USER/.local/bin/dwm_scripts/start_lynx", NULL};
+static const char *thunar[]  = { "/usr/bin/thunar", NULL};
+static const char *lf[]  = { "/home/$USER/.local/bin/dwm_scripts/start_lf", NULL};
+static const char *slock[]  = { "slock", NULL};
+\end{lstlisting}
+
+\noindent\textbf{Making key-bindings}:
+\begin{lstlisting}
+static const Key keys[] = {
+     /* modifier                 key        function        argument */
+     { MODKEY,                   XK_d,      spawn,          {.v = dmenucmd } },
+     { MODKEY,                   XK_Return, spawn,          {.v = termcmd } },
+     { MODKEY,                   XK_w,      spawn,          {.v = firefox } },
+     { MODKEY|ShiftMask,         XK_w,      spawn,          {.v = lynx } },
+     { MODKEY|ShiftMask,         XK_o,      spawn,          {.v = thunar } },
+     { MODKEY,                   XK_o,      spawn,          {.v = lf } },
+     { MODKEY|ShiftMask,         XK_l,      spawn,          {.v = slock } },
+	...
+\end{lstlisting}
+\subsection{Dwmblocks}
+
+Dwmblocks is a status bar program for the DWM window manager. It is a simple and lightweight program that displays various system information, such as the date and time, CPU and memory usage, and network activity, in a customizable status bar at the top of the screen. Dwmblocks is written in C and is highly configurable, allowing users to customize the information that is displayed and the appearance of the status bar.
+\newline
+\newline
+Dwmblocks is designed to work seamlessly with DWM, and is often used by users who want to display system information in the status bar of their DWM-based desktop environment. Some of the key features of Dwmblocks include:
+\begin{itemize}
+	\item \textbf{Customizable display}: Dwmblocks allows users to choose which system information to display in the status bar, and to customize the layout and appearance of the status bar.
+	\item \textbf{Multiple data sources}: can display information from a variety of sources, including the system clock, CPU and memory usage, and network activity.
+	\item \textbf{Mouse-based interaction}: allows users to interact with some of the displayed information using the mouse, such as by clicking on the clock to open the calendar.
+	\item \textbf{Extensibility}: Dwmblocks can be easily extended by writing custom scripts to display additional information or provide new features.
+\end{itemize}
+The configuration file for Dwmblocks is found under \texttt{.local/src/dwmblocks} with the name \texttt{blocks.h}. The patches applied on the original DWM software are found in \texttt{.local/src/dwmblocks/patches} and include:
+\begin{itemize}
+	\item \textbf{statuscmd}: used to provide clickability and better integration with DWM 
+\end{itemize}
+
+
+\noindent The \texttt{blocks.h} file contains the scripts whose output is to be displayed in the status bar. The scripts are located in the users's home directory under \texttt{.local/bin/dwmblocks\_scripts/}. When added in \texttt{blocks.h} file, they need to be added in the form:
+
+\begin{lstlisting}
+/*Icon*/    /*Command*/    /*Update Interval*/    /*Update Signal*/
+{"",			"disk_usage",            30,		             16},
+\end{lstlisting}
+
+\noindent Where \textbf{Command} is the script, \textbf{Update Interval} is the amount of time in seconds at which the system sends a signal to the already running process \textbf{dwmblocks} to update, based on the signal from \textbf{Update Signal} + 44. An example of how would this look like:
+\lstset{language=sh}
+\begin{lstlisting}
+kill -47 $(pidof dwmblocks)
+\end{lstlisting}
+
+\noindent In order to add click functionality to your scripts, the following needs to be added:
+\lstset{language=C}
+\begin{itemize}
+	\item \textbf{DWM}: click buttons need to be defined
+		\begin{lstlisting}
+static const Button buttons[] = {
+     { ClkStatusText,  0,          Button1,   sigstatusbar,   {.i = 1} },
+     { ClkStatusText,  0,          Button2,   sigstatusbar,   {.i = 2} },
+     { ClkStatusText,  0,          Button3,   sigstatusbar,   {.i = 3} },
+     { ClkStatusText,  ShiftMask,  Button1,   sigstatusbar,   {.i = 6} },
+     ...
+}
+		\end{lstlisting}
+	\texttt{Button1} represents Left Click\\
+	\texttt{Button2} represents Wheel Click\\
+	\texttt{Button3} represents Right Click
+	
+	\item \textbf{Script}: in the scripts, there needs to be defined a `case` function to check for the buttons on which and implementation is desired:
+	\lstset{language=bash}
+	\begin{lstlisting}
+	case $BUTTON in
+        1) dunstify "$RESULT" ;;
+        3) st -e htop ;;
+        6) st -e vim $(which $0) ;;
+	esac
+	\end{lstlisting}
+	\lstset{language=C}
+	In the above example, \texttt{6)} is going to represent \texttt{Shift + Left Click} which is going to open in \texttt{vim} the script.
+\end{itemize}
+
+
+
+
+\subsection{ST}
+
+ST (short for "suckless terminal") is a simple and minimalistic terminal emulator.
+ST is written in C and is highly configurable, allowing users to customize its appearance and behavior to suit their preferences.
+\newline
+\newline
+ST is designed to be a fast and efficient terminal emulator, with a focus on simplicity and minimalism. Some of the key features of ST include:
+\begin{itemize}
+	\item \textbf{Customizable appearance}: ST allows users to customize the colors, font, and size of the terminal, as well as the window decorations.
+	\item \textbf{Keyboard-based navigation}: can be controlled entirely from the keyboard, which can make it faster and more efficient to use.
+	\item \textbf{Unicode support}: supports the Unicode character set, allowing it to display a wide range of characters and symbols from various languages and scripts.
+	\item \textbf{Extensibility}: is highly customizable, and users can easily add new features or modify its behavior by writing their own patches or scripts.
+\end{itemize}
+
+\noindent The configuration file for ST is found under \texttt{.local/src/st} with the name \texttt{config.h}. The patches applied on the original ST software are found in \texttt{.local/src/st/patches} and include:
+\begin{itemize}
+	\item \textbf{anysize}: added in order to work correctly with the \texttt{gaps} patch from DWM (without it gaps may differ in size when multiple windows are open)
+	\item \textbf{alpha}: to add opacity/transperency
+	\item \textbf{scrollback-ringbuffer}: it is used to scrollback in the terminal  
+\end{itemize}
+
+\noindent The \texttt{config.h} file contains the following personal additions: 
+\newline
+
+\noindent\textbf{Font size}:
+\begin{lstlisting}
+static char *font = "Liberation Mono:pixelsize=18:antialias=true:autohint=true";
+\end{lstlisting}
+
+\noindent\textbf{Shell}:
+\begin{lstlisting}
+static char *shell = "/bin/sh"
+\end{lstlisting}
+
+\noindent\textbf{The opacity (it's a range between 0 and 1)}:
+\begin{lstlisting}
+float alpha = 0.9;
+\end{lstlisting}
+
+\subsection{Slock}
+
+Slock is a simple, light-weight lock manager for Linux and Unix-like operating systems. Slock is designed to be easy to use and customize, and it has a command-line interface that allows users to quickly lock and unlock their screens. It is a popular choice among users who value simplicity and speed in their software.\\
+\newline
+\noindent The configuration file for Slock is found under \texttt{.local/src/slock} with the name \texttt{config.h}.\\
+The \texttt{config.h} needs those modifications in order to function:
+\begin{lstlisting}
+static const char *user  = "user";
+static const char *group = "wheel";
+\end{lstlisting}
+
+\noindent The value \textbf{user} needs to be modified accordingly with the local user from the system.\\
+The group \textbf{wheel} represents the group with root privileages.\\
+\newline
+\noindent\underline{Important Note:}
+\newline
+
+\noindent In each of the suckless programs, there are two important configuration files: \texttt{config.h} and 
+\texttt{config.def.h}. Any modifications should be done on \texttt{config.h}. After the modifications have been applied, the user (with \textbf{root} privileages) needs to run the following command:
+
+\begin{lstlisting}
+sudo make clean install
+\end{lstlisting}
+
+\noindent For more information about the build process check the \texttt{Makefile}.
+
+\clearpage
+\section{Home directory structure}
+
+The user's home directory should have the following structure:
+\begin{verbatim}
+./.vim
+./.vim/vimrc
+./.local
+./.local/src
+./.local/bin
+./.ssh
+./.zshrc
+./.zsh_history
+./pictures
+./pictures/wallpapers
+./.profile
+./.config
+./.config/dunst
+./.config/user_guide.pdf
+./.config/icons
+./.config/lf
+./.xinitrc
+\end{verbatim}
+\begin{itemize}
+	\item Under \textbf{.vim} should be all user configuration for the vim editor, including any additional plugins.
+	\item \textbf{.local/bin}: should store user scripts and programs
+	\item \textbf{.local/src}: should store programs installed by source and compiled
+	\item \textbf{.ssh}: all user specific configuration for \texttt{ssh}
+	\item \textbf{.config}: should contain all user configuration about system-wide and local programs
+\end{itemize}
+
+\noindent The \textbf{pictures/wallpapers} directory is a personal addition created for pictures that are to be displayed as the desktop's wallpaper.
+\newline
+
+
+\noindent The files \textbf{.zshrc} and \textbf{.profile} are usual for a system in which a login is required for a user that has as the default shell \texttt{/bin/zsh}. The \textbf{.xinitrc} file is specific for the \textbf{X Window} and is used to start programs at login upon executing \texttt{startx} (which in this case is automatically executed in \texttt{.zshrc}).
+
+\clearpage
+
+\section{Programs}
+
+All installed programs are listed and described in \href{https://github.com/arghpy/individual_project/blob/main/packages.csv}{packages.csv} file.
+\newline
+\newline
+\noindent They were chosen to reflect the minimalist and lightweight style of the linux distribution. Their purpose is to increase efficiency by using mostly only the keyboard.\\
+Given their simple and lightweight design, stability is also one of the reasons why they were chosen.
+
+\section{Troubleshooting}
+
+In case that the keys cannot be initialized correctly, the following should be done:
+\lstset{language=bash}
+\begin{lstlisting}
+#Open for editing the file /etc/pacman.conf (with nano or vim)
+$: vim /etc/pacman.conf
+
+
+#Search for the line with `ParallelDownloads` and modify it 
+#like this:
+ParallelDownloads = 5
+
+
+#Search for the line with `SigLevel` and modify it like this:
+SigLevel	= Never
+
+#Save the file
+
+#Initialize the key:
+$: pacman-key --init
+
+#Download the current keys for arch
+$: pacman --noconfirm -Sy archlinux-keyring
+\end{lstlisting}
+
+\noindent After the above steps are performed, edit the file again as it was, except for the parallel downloads
+if this interests you.
+
+\clearpage
+\section{Conclusion}
+The project successfully combined the minimalist philosophy of the suckless community with the flexible and powerful Arch Linux operating system. By carefully selecting and installing a range of software from the suckless community and other software that shares the same philosophy, a custom Linux distribution emerged that prioritized simplicity, efficiency, and customization. This project serves as a confirmation to the value of minimalist and efficient design.\\
+\newline
+This project was a rewarding and satisfying experience for me because it\\
+integrates different values that I care for like minimalism and open-source\\
+software. It challenged me to think creatively and critically about different approaches to accomplish this result.
+
+\end{document}
+
