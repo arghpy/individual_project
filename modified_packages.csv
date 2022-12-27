@@ -44,6 +44,9 @@ brightnessctl,repo,Used for managing window brightness
 aspell,repo,Used for correcting text gramatically
 xdg-user-dirs,repo,Sets the defaults folder icon (e.g. Documents/Music)
 xclip,repo,Clipboard manager for X
+pulsemixer,repo,Audio Controller
+wireplumber,repo,Audio system
+pipewire-pulse,repo,Gives pipewire compatibility with PulseAudio programs
 sysstat,repo,System statistics
 lightdm,repo,Login manager
 lightdm-gtk-greeter,repo,Login manager greeter
